@@ -1,0 +1,444 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Tribesence — Find Your Tribe{% endblock %}
+
+{% block extra_head %}
+<style>
+/* ── HERO ─────────────────────────────────────────────────── */
+.hero {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 64px 48px 48px;
+  position: relative;
+  overflow: hidden;
+}
+
+.hero-bg {
+  position: absolute; inset: 0;
+  background:
+    radial-gradient(ellipse 80% 55% at 50% 28%, rgba(231,111,81,0.08) 0%, transparent 70%),
+    radial-gradient(ellipse 55% 38% at 80% 72%, rgba(38,70,83,0.05) 0%, transparent 60%),
+    var(--bg);
+  z-index: 0;
+}
+/* Grain texture */
+.hero-bg::after {
+  content: '';
+  position: absolute; inset: 0;
+  opacity: 0.025;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+.hero-inner {
+  position: relative; z-index: 2;
+  text-align: center;
+  max-width: 760px;
+  width: 100%;
+}
+
+/* ── ANIMATION STAGE ──────────────────────────────────────── */
+.stage {
+  width: 560px;
+  height: 230px;
+  position: relative;
+  margin: 0 auto 36px;
+}
+
+/* ── LEFT SOLO CHARACTER ─── slides in from left ─────────── */
+.char-solo {
+  position: absolute;
+  left: 20px;
+  bottom: 0;
+  transform: translateX(-160px);
+  opacity: 0;
+  animation: slideFromLeft 0.85s cubic-bezier(0.34,1.45,0.64,1) 0.25s forwards;
+}
+
+/* Waving arm CSS animation — runs after character settles */
+.wave-arm {
+  transform-origin: 88px 95px; /* shoulder pivot point */
+  animation:
+    slideFromLeft 0.85s cubic-bezier(0.34,1.45,0.64,1) 0.25s forwards,
+    waveHand 0.5s ease-in-out 1.2s 4 alternate;
+}
+
+@keyframes waveHand {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(-28deg); }
+}
+
+@keyframes slideFromLeft {
+  to { transform: translateX(0); opacity: 1; }
+}
+
+/* ── RIGHT GROUP ─── slides in from right ────────────────── */
+.char-group {
+  position: absolute;
+  right: 10px;
+  bottom: 0;
+  transform: translateX(160px);
+  opacity: 0;
+  animation: slideFromRight 0.85s cubic-bezier(0.34,1.45,0.64,1) 0.25s forwards;
+}
+
+@keyframes slideFromRight {
+  to { transform: translateX(0); opacity: 1; }
+}
+
+/* ── HEADLINE BLOCK ── fades up after chars settle ─────────── */
+.hero-text {
+  opacity: 0;
+  transform: translateY(22px);
+  animation: fadeUp 0.6s ease 1.25s forwards;
+}
+
+@keyframes fadeUp {
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.hero-h1 {
+  font-family: var(--font-display);
+  font-size: clamp(50px, 7vw, 80px);
+  font-weight: 800;
+  letter-spacing: -2.5px;
+  line-height: 1.04;
+  color: var(--text-primary);
+  margin-bottom: 18px;
+}
+.hero-h1 .hl { color: var(--primary); }
+
+.hero-sub {
+  font-size: 18px;
+  line-height: 1.75;
+  color: var(--text-secondary);
+  max-width: 520px;
+  margin: 0 auto 36px;
+  font-weight: 400;
+}
+
+.hero-ctas {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-bottom: 48px;
+}
+
+/* Trust badges */
+.trust-row {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+  flex-wrap: wrap;
+  opacity: 0;
+  animation: fadeUp 0.6s ease 1.9s forwards;
+}
+.trust-badge {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--surface);
+  border-radius: var(--r-full);
+  padding: 8px 18px;
+  font-size: 13px;
+  color: var(--text-secondary);
+  font-weight: 500;
+  box-shadow: var(--shadow-card);
+}
+.trust-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--primary); flex-shrink: 0; }
+
+/* Scroll hint */
+.scroll-hint {
+  position: absolute;
+  bottom: 32px; left: 50%;
+  transform: translateX(-50%);
+  opacity: 0;
+  animation: fadeUp 0.5s ease 2.2s forwards;
+  display: flex; flex-direction: column; align-items: center; gap: 6px;
+  color: var(--text-muted); font-size: 11px; font-weight: 600;
+  letter-spacing: 1.5px; text-transform: uppercase; z-index: 2;
+}
+.scroll-dot { width: 4px; height: 4px; border-radius: 50%; background: var(--text-muted); animation: blink 1.4s ease 2.5s infinite; }
+@keyframes blink { 0%,100%{opacity:.3} 50%{opacity:1} }
+
+/* ── FEATURES ─────────────────────────────────────────────── */
+.features-section { padding: 80px 0 96px; }
+
+.section-eyebrow {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+  color: var(--primary);
+  margin-bottom: 12px;
+}
+.section-title {
+  font-family: var(--font-display);
+  font-size: clamp(30px, 4vw, 46px);
+  font-weight: 800;
+  letter-spacing: -1.5px;
+  line-height: 1.1;
+  color: var(--text-primary);
+  margin-bottom: 12px;
+}
+.section-sub {
+  font-size: 16px;
+  color: var(--text-secondary);
+  line-height: 1.65;
+  max-width: 520px;
+  margin-bottom: 52px;
+}
+
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+}
+
+.feat-card {
+  background: var(--surface);
+  border-radius: var(--r-card);
+  padding: 28px 24px;
+  box-shadow: var(--shadow-card);
+  transition: transform var(--t-base), box-shadow var(--t-base);
+}
+.feat-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-warm); }
+
+.feat-icon {
+  width: 48px; height: 48px;
+  border-radius: 14px;
+  background: var(--primary-light);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px;
+  margin-bottom: 18px;
+}
+.feat-title {
+  font-family: var(--font-display);
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 8px;
+  letter-spacing: -0.3px;
+}
+.feat-desc {
+  font-size: 14px;
+  color: var(--text-secondary);
+  line-height: 1.65;
+}
+
+/* ── RESPONSIVE ───────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .stage { width: 320px; height: 160px; }
+  .char-solo svg { width: 80px; }
+  .char-group svg { width: 150px; }
+  .hero { padding: 80px 24px 48px; }
+  .features-grid { grid-template-columns: 1fr; }
+  .trust-row { gap: 10px; }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- ═══════════════════ HERO ═══════════════════ -->
+<section class="hero">
+  <div class="hero-bg"></div>
+
+  <div class="hero-inner">
+
+    <!-- CHARACTER ANIMATION STAGE -->
+    <div class="stage" aria-hidden="true">
+
+      <!-- LEFT: Solo character — one waving arm raised (left body arm down, right arm waving) -->
+      <div class="char-solo">
+        <svg width="115" height="210" viewBox="0 0 115 210" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <!-- Head -->
+          <ellipse cx="57" cy="52" rx="24" ry="24" fill="#FDBA9A"/>
+          <!-- Hair -->
+          <ellipse cx="57" cy="35" rx="24" ry="15" fill="#2B1810"/>
+          <ellipse cx="34" cy="42" rx="7" ry="13" fill="#2B1810"/>
+          <!-- Neck -->
+          <rect x="50" y="73" width="14" height="12" rx="4" fill="#FDBA9A"/>
+          <!-- Shirt / torso -->
+          <path d="M26 98 Q57 84 88 98 L91 162 Q57 174 23 162 Z" fill="#E76F51"/>
+          <!-- Shirt collar detail -->
+          <path d="M46 85 L57 98 L68 85" stroke="#C85A3B" stroke-width="2" fill="none"/>
+
+          <!-- LEFT arm (character's left = our right side) — hanging naturally -->
+          <path d="M88 105 Q100 128 96 152" stroke="#FDBA9A" stroke-width="15" stroke-linecap="round"/>
+          <!-- Left hand -->
+          <circle cx="96" cy="154" r="8" fill="#FDBA9A"/>
+
+          <!-- RIGHT arm (character's right = our left side) — raised & WAVING
+               We animate this entire <g> around the shoulder pivot -->
+          <g class="wave-arm">
+            <!-- Upper arm going up-right -->
+            <path d="M26 105 Q10 82 12 60" stroke="#FDBA9A" stroke-width="15" stroke-linecap="round"/>
+            <!-- Forearm & waving hand open palm -->
+            <path d="M12 60 Q8 44 14 34" stroke="#FDBA9A" stroke-width="13" stroke-linecap="round"/>
+            <!-- Open palm / hand -->
+            <ellipse cx="16" cy="30" rx="10" ry="12" fill="#FDBA9A"/>
+            <!-- Fingers spread open — waving gesture -->
+            <line x1="9"  y1="22" x2="6"  y2="13" stroke="#FDBA9A" stroke-width="4" stroke-linecap="round"/>
+            <line x1="13" y1="19" x2="11" y2="9"  stroke="#FDBA9A" stroke-width="4" stroke-linecap="round"/>
+            <line x1="17" y1="18" x2="17" y2="8"  stroke="#FDBA9A" stroke-width="4" stroke-linecap="round"/>
+            <line x1="21" y1="19" x2="24" y2="10" stroke="#FDBA9A" stroke-width="4" stroke-linecap="round"/>
+            <line x1="24" y1="22" x2="28" y2="16" stroke="#FDBA9A" stroke-width="4" stroke-linecap="round"/>
+          </g>
+
+          <!-- Pants -->
+          <path d="M35 162 Q28 186 33 205" stroke="#264653" stroke-width="19" stroke-linecap="round"/>
+          <path d="M79 162 Q86 186 81 205" stroke="#264653" stroke-width="19" stroke-linecap="round"/>
+          <!-- Shoes -->
+          <ellipse cx="32" cy="206" rx="13" ry="6" fill="#1a2e38"/>
+          <ellipse cx="82" cy="206" rx="13" ry="6" fill="#1a2e38"/>
+
+          <!-- Face: eyes -->
+          <ellipse cx="49" cy="57" rx="3.5" ry="4" fill="#2B1810"/>
+          <ellipse cx="65" cy="57" rx="3.5" ry="4" fill="#2B1810"/>
+          <!-- Eye shine -->
+          <circle cx="50.5" cy="55.5" r="1.2" fill="#fff"/>
+          <circle cx="66.5" cy="55.5" r="1.2" fill="#fff"/>
+          <!-- Happy smile -->
+          <path d="M48 69 Q57 76 66 69" stroke="#2B1810" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+          <!-- Cheeks -->
+          <ellipse cx="43" cy="65" rx="5" ry="3.5" fill="rgba(231,111,81,0.22)"/>
+          <ellipse cx="71" cy="65" rx="5" ry="3.5" fill="rgba(231,111,81,0.22)"/>
+        </svg>
+      </div>
+
+      <!-- RIGHT: Group of 3 people — no extra arms, clean composition -->
+      <div class="char-group">
+        <svg width="235" height="210" viewBox="0 0 235 210" fill="none" xmlns="http://www.w3.org/2000/svg">
+
+          <!-- ── PERSON A (back-left, darker skin) ── -->
+          <ellipse cx="58" cy="48" rx="20" ry="20" fill="#C68642"/>
+          <ellipse cx="58" cy="32" rx="20" ry="13" fill="#1a0e06"/>
+          <rect x="51" y="65" width="14" height="10" rx="4" fill="#C68642"/>
+          <path d="M30 88 Q58 74 86 88 L89 146 Q58 158 27 146 Z" fill="#264653"/>
+          <!-- Left arm down -->
+          <path d="M30 94 Q18 116 21 138" stroke="#C68642" stroke-width="13" stroke-linecap="round"/>
+          <circle cx="21" cy="140" r="7" fill="#C68642"/>
+          <!-- Right arm down -->
+          <path d="M86 94 Q98 116 95 138" stroke="#C68642" stroke-width="13" stroke-linecap="round"/>
+          <circle cx="95" cy="140" r="7" fill="#C68642"/>
+          <!-- Legs -->
+          <path d="M38 146 Q32 170 36 186" stroke="#1a3340" stroke-width="16" stroke-linecap="round"/>
+          <path d="M78 146 Q84 170 80 186" stroke="#1a3340" stroke-width="16" stroke-linecap="round"/>
+          <ellipse cx="35" cy="187" rx="11" ry="5" fill="#0d1f27"/>
+          <ellipse cx="81" cy="187" rx="11" ry="5" fill="#0d1f27"/>
+          <!-- Face A -->
+          <ellipse cx="51" cy="53" rx="3" ry="3.5" fill="#1a0e06"/>
+          <ellipse cx="65" cy="53" rx="3" ry="3.5" fill="#1a0e06"/>
+          <circle cx="52" cy="51.8" r="1" fill="#fff"/>
+          <circle cx="66" cy="51.8" r="1" fill="#fff"/>
+          <path d="M51 62 Q58 67 65 62" stroke="#1a0e06" stroke-width="2" stroke-linecap="round" fill="none"/>
+
+          <!-- ── PERSON B (back-right, light skin, yellow shirt) ── -->
+          <ellipse cx="178" cy="48" rx="20" ry="20" fill="#FDBA9A"/>
+          <ellipse cx="178" cy="32" rx="20" ry="13" fill="#7a3e10"/>
+          <rect x="171" y="65" width="14" height="10" rx="4" fill="#FDBA9A"/>
+          <path d="M150 88 Q178 74 206 88 L209 146 Q178 158 147 146 Z" fill="#E9C46A"/>
+          <!-- Left arm down -->
+          <path d="M150 94 Q138 116 141 138" stroke="#FDBA9A" stroke-width="13" stroke-linecap="round"/>
+          <circle cx="141" cy="140" r="7" fill="#FDBA9A"/>
+          <!-- Right arm down -->
+          <path d="M206 94 Q218 116 215 138" stroke="#FDBA9A" stroke-width="13" stroke-linecap="round"/>
+          <circle cx="215" cy="140" r="7" fill="#FDBA9A"/>
+          <!-- Legs -->
+          <path d="M158 146 Q152 170 156 186" stroke="#5c4700" stroke-width="16" stroke-linecap="round"/>
+          <path d="M198 146 Q204 170 200 186" stroke="#5c4700" stroke-width="16" stroke-linecap="round"/>
+          <ellipse cx="155" cy="187" rx="11" ry="5" fill="#3d2f00"/>
+          <ellipse cx="201" cy="187" rx="11" ry="5" fill="#3d2f00"/>
+          <!-- Face B -->
+          <ellipse cx="171" cy="53" rx="3" ry="3.5" fill="#7a3e10"/>
+          <ellipse cx="185" cy="53" rx="3" ry="3.5" fill="#7a3e10"/>
+          <circle cx="172" cy="51.8" r="1" fill="#fff"/>
+          <circle cx="186" cy="51.8" r="1" fill="#fff"/>
+          <path d="M171 62 Q178 67 185 62" stroke="#7a3e10" stroke-width="2" stroke-linecap="round" fill="none"/>
+
+          <!-- ── PERSON C (front-center, slightly larger — the star) ── -->
+          <ellipse cx="118" cy="40" rx="22" ry="22" fill="#F4A87C"/>
+          <ellipse cx="118" cy="23" rx="22" ry="14" fill="#3D1A00"/>
+          <!-- Curly hair detail -->
+          <ellipse cx="96"  cy="30" rx="8"  ry="10" fill="#3D1A00"/>
+          <ellipse cx="140" cy="30" rx="8"  ry="10" fill="#3D1A00"/>
+          <rect x="110" y="59" width="16" height="11" rx="5" fill="#F4A87C"/>
+          <path d="M87 82 Q118 67 149 82 L153 148 Q118 162 83 148 Z" fill="#E76F51"/>
+          <!-- Shirt collar -->
+          <path d="M106 70 L118 84 L130 70" stroke="#C85A3B" stroke-width="2" fill="none"/>
+          <!-- Left arm (our right) — hanging down -->
+          <path d="M149 89 Q163 114 159 140" stroke="#F4A87C" stroke-width="14" stroke-linecap="round"/>
+          <circle cx="158" cy="142" r="8" fill="#F4A87C"/>
+          <!-- Right arm (our left) — hanging down -->
+          <path d="M87 89 Q73 114 77 140" stroke="#F4A87C" stroke-width="14" stroke-linecap="round"/>
+          <circle cx="78" cy="142" r="8" fill="#F4A87C"/>
+          <!-- Legs -->
+          <path d="M96 148 Q88 174 93 192" stroke="#264653" stroke-width="18" stroke-linecap="round"/>
+          <path d="M140 148 Q148 174 143 192" stroke="#264653" stroke-width="18" stroke-linecap="round"/>
+          <ellipse cx="92"  cy="193" rx="13" ry="6" fill="#1a2e38"/>
+          <ellipse cx="144" cy="193" rx="13" ry="6" fill="#1a2e38"/>
+          <!-- Face C -->
+          <ellipse cx="110" cy="46" rx="3.5" ry="4" fill="#3D1A00"/>
+          <ellipse cx="126" cy="46" rx="3.5" ry="4" fill="#3D1A00"/>
+          <circle cx="111.5" cy="44.5" r="1.2" fill="#fff"/>
+          <circle cx="127.5" cy="44.5" r="1.2" fill="#fff"/>
+          <path d="M109 57 Q118 64 127 57" stroke="#3D1A00" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+          <ellipse cx="103" cy="52" rx="6" ry="4" fill="rgba(231,111,81,0.22)"/>
+          <ellipse cx="133" cy="52" rx="6" ry="4" fill="rgba(231,111,81,0.22)"/>
+        </svg>
+      </div>
+    </div><!-- /stage -->
+
+    <!-- HEADLINE — appears after animation -->
+    <div class="hero-text">
+      <h1 class="hero-h1">Find Your <span class="hl">Tribe</span></h1>
+      <p class="hero-sub">Real connections, shared experiences, and people who actually get you. Not an algorithm. A community.</p>
+      <div class="hero-ctas">
+        <a href="{% url 'onboarding' %}" class="btn btn-primary btn-lg">Create a Tribe</a>
+        <a href="{% url 'explore' %}" class="btn btn-secondary btn-lg">Explore Tribes</a>
+      </div>
+      <div class="trust-row">
+        <div class="trust-badge"><div class="trust-dot"></div>12,000+ tribes formed</div>
+        <div class="trust-badge"><div class="trust-dot"></div>Real people, real places</div>
+        <div class="trust-badge"><div class="trust-dot"></div>No ads, ever</div>
+      </div>
+    </div>
+
+  </div><!-- /hero-inner -->
+
+  <div class="scroll-hint" aria-hidden="true">
+    <span>Scroll</span>
+    <div class="scroll-dot"></div>
+  </div>
+</section>
+
+<!-- ═══════════════════ FEATURES ═══════════════════ -->
+<section class="features-section">
+  <div class="container">
+    <div class="section-eyebrow">Why Tribesence</div>
+    <h2 class="section-title">Built for real life,<br>not screens</h2>
+    <p class="section-sub">Every tribe is centred around actually doing things together — not just talking about it.</p>
+
+    <div class="features-grid">
+      <div class="feat-card">
+        <div class="feat-icon">🍜</div>
+        <div class="feat-title">Shared Experiences</div>
+        <p class="feat-desc">From street food crawls to gallery nights — every tribe is built around doing things together, not just liking posts.</p>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon">🗺️</div>
+        <div class="feat-title">Local First</div>
+        <p class="feat-desc">We connect you with people in your city who are looking for the same kind of adventure, at the same kind of pace.</p>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon">✨</div>
+        <div class="feat-title">Curated Matching</div>
+        <p class="feat-desc">Answer a few questions and we surface tribes that actually fit your vibe, your schedule, and your season of life.</p>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

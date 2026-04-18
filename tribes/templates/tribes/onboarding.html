@@ -1,0 +1,477 @@
+{% extends 'core/base.html' %}
+{% block title %}Create Your Tribe — Tribesence{% endblock %}
+
+{% block extra_head %}
+<style>
+.onboard-wrap {
+  min-height: 100vh;
+  display: flex; align-items: center; justify-content: center;
+  padding: 80px 24px 40px;
+  background: var(--bg);
+}
+
+.onboard-card {
+  background: var(--surface);
+  border-radius: var(--r-xl);
+  padding: 52px 48px;
+  width: 100%; max-width: 620px;
+  box-shadow: var(--shadow-float);
+  display: flex; flex-direction: column;
+  min-height: 560px;
+}
+
+/* Progress bar */
+.progress-track {
+  display: flex; gap: 6px; margin-bottom: 40px;
+}
+.progress-pip {
+  flex: 1; height: 4px; border-radius: var(--r-full);
+  background: var(--border); transition: background 0.35s ease;
+}
+.progress-pip.done { background: var(--primary); }
+.progress-pip.current {
+  background: linear-gradient(90deg, var(--primary) 60%, rgba(231,111,81,0.3) 100%);
+}
+
+.step-eyebrow {
+  font-size: 11px; font-weight: 800; letter-spacing: 2.5px;
+  text-transform: uppercase; color: var(--primary); margin-bottom: 8px;
+}
+.step-title {
+  font-family: var(--font-display);
+  font-size: 26px; font-weight: 800; letter-spacing: -0.8px;
+  color: var(--text-primary); margin-bottom: 8px; line-height: 1.2;
+}
+.step-sub {
+  font-size: 14px; color: var(--text-secondary);
+  line-height: 1.6; margin-bottom: 32px;
+}
+
+.step-body { flex: 1; }
+
+/* Form layout helpers */
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+/* YES / NO Cards */
+.yn-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 8px; }
+.yn-card {
+  background: var(--surface-low); border-radius: 18px;
+  padding: 32px 20px; cursor: pointer;
+  border: 2px solid transparent; text-align: center;
+  transition: all var(--t-base); user-select: none;
+}
+.yn-card:hover { background: var(--primary-light); border-color: rgba(231,111,81,0.25); }
+.yn-card.selected { background: var(--primary-light); border-color: var(--primary); }
+.yn-icon { font-size: 38px; display: block; margin-bottom: 12px; }
+.yn-label { font-size: 15px; font-weight: 700; color: var(--text-primary); line-height: 1.3; }
+
+/* Selection grid */
+.sel-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  gap: 10px; margin-bottom: 8px;
+}
+.sel-card {
+  background: var(--surface-low); border-radius: 14px;
+  padding: 18px 12px; cursor: pointer;
+  border: 2px solid transparent; text-align: center;
+  transition: all var(--t-base); user-select: none;
+}
+.sel-card:hover { background: var(--primary-light); border-color: rgba(231,111,81,0.25); }
+.sel-card.selected { background: var(--primary-light); border-color: var(--primary); }
+.sel-icon { font-size: 28px; display: block; margin-bottom: 8px; }
+.sel-label { font-size: 13px; font-weight: 600; color: var(--text-primary); line-height: 1.3; }
+
+/* Chips */
+.chip-section { margin-bottom: 24px; }
+.chip-section-label {
+  font-size: 12px; font-weight: 700; letter-spacing: 1.5px;
+  text-transform: uppercase; color: var(--text-muted); margin-bottom: 10px;
+}
+.chip-row { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip {
+  background: var(--surface-low); border-radius: var(--r-full);
+  padding: 9px 18px; font-size: 14px; font-weight: 600;
+  color: var(--text-secondary); cursor: pointer;
+  border: 2px solid transparent; transition: all var(--t-base); user-select: none;
+}
+.chip:hover { color: var(--text-primary); border-color: rgba(231,111,81,0.2); }
+.chip.selected { color: var(--primary); background: var(--primary-light); border-color: var(--primary); }
+
+/* Rank list */
+.rank-list { display: flex; flex-direction: column; gap: 8px; }
+.rank-item {
+  background: var(--surface-low); border-radius: 12px;
+  padding: 14px 16px; display: flex; align-items: center; gap: 12px;
+  cursor: pointer; border: 2px solid transparent; transition: all var(--t-base);
+}
+.rank-item:hover { border-color: rgba(231,111,81,0.2); }
+.rank-item.ranked { background: var(--primary-light); border-color: var(--primary); }
+.rank-num {
+  width: 30px; height: 30px; border-radius: 50%;
+  background: var(--border); display: flex; align-items: center;
+  justify-content: center; font-size: 13px; font-weight: 700;
+  color: var(--text-muted); flex-shrink: 0; transition: all var(--t-base);
+}
+.rank-item.ranked .rank-num { background: var(--primary); color: #fff; }
+.rank-label { font-size: 14px; font-weight: 600; color: var(--text-primary); }
+
+/* Sliders */
+.slider-block { margin-bottom: 28px; }
+.slider-header {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 10px;
+}
+.slider-label { font-size: 14px; font-weight: 600; color: var(--text-primary); }
+.slider-val {
+  font-size: 14px; font-weight: 700; color: var(--primary);
+  min-width: 70px; text-align: right;
+}
+input[type="range"] {
+  width: 100%; height: 5px; border-radius: var(--r-full);
+  appearance: none; background: var(--border); cursor: pointer; outline: none;
+}
+input[type="range"]::-webkit-slider-thumb {
+  appearance: none; width: 20px; height: 20px; border-radius: 50%;
+  background: var(--primary); border: 3px solid var(--surface);
+  box-shadow: 0 2px 8px rgba(231,111,81,0.35); cursor: pointer;
+}
+input[type="range"]::-moz-range-thumb {
+  width: 20px; height: 20px; border-radius: 50%;
+  background: var(--primary); border: 3px solid var(--surface); cursor: pointer;
+}
+
+/* Step nav */
+.step-nav {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-top: 36px; padding-top: 24px; border-top: 1px solid var(--border);
+}
+.btn-back {
+  background: none; border: none; cursor: pointer;
+  font-size: 14px; font-weight: 600; color: var(--text-muted);
+  font-family: var(--font-body); padding: 8px 4px;
+  display: flex; align-items: center; gap: 6px;
+  transition: color var(--t-fast);
+}
+.btn-back:hover { color: var(--text-primary); }
+.step-counter { font-size: 13px; color: var(--text-muted); font-weight: 500; }
+
+/* Success */
+.success-wrap {
+  flex: 1; display: flex; flex-direction: column;
+  align-items: center; justify-content: center; text-align: center; padding: 20px 0;
+}
+.success-icon {
+  width: 88px; height: 88px; border-radius: 50%;
+  background: var(--primary-light);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 40px; margin-bottom: 28px;
+  animation: popIn 0.55s cubic-bezier(0.34,1.56,0.64,1) forwards;
+}
+@keyframes popIn { from { transform: scale(0.4); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+.success-title {
+  font-family: var(--font-display);
+  font-size: 34px; font-weight: 800; letter-spacing: -1.2px;
+  color: var(--text-primary); margin-bottom: 14px;
+}
+.success-sub {
+  font-size: 16px; color: var(--text-secondary);
+  line-height: 1.65; margin-bottom: 36px; max-width: 400px;
+}
+
+@media (max-width: 640px) {
+  .onboard-card { padding: 36px 24px; }
+  .sel-grid { grid-template-columns: repeat(2, 1fr); }
+  .yn-grid { grid-template-columns: 1fr; }
+  .grid-2 { grid-template-columns: 1fr; }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="onboard-wrap">
+  <div class="onboard-card" id="onboardCard">
+    <!-- Rendered by JS based on currentStep -->
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+const TOTAL_STEPS = 7;
+let currentStep = {{ step|default:1 }};
+const saved = {};  // In-memory for this session; form POSTs persist to DB
+
+/* ─── STEP DEFINITIONS ─────────────────────────────────── */
+const STEPS = [
+  {
+    eyebrow: 'Step 1 of 7 — Let\'s start',
+    title: 'Name your tribe',
+    sub:   'Give us the basics to get your tribe off the ground.',
+    type:  'form',
+  },
+  {
+    eyebrow: 'Step 2 of 7 — Intent',
+    title: 'Planning something?',
+    sub:   'Are you already thinking about an experience you want to share?',
+    type:  'yesno',
+    key:   'planning',
+    options: [
+      { icon: '✋', label: 'Yes, I have something in mind',   value: 'yes' },
+      { icon: '🌱', label: 'No, I\'m open to anything',       value: 'no'  },
+    ],
+  },
+  {
+    eyebrow: 'Step 3 of 7 — Preferences',
+    title: 'What do you love to do?',
+    sub:   'Pick the kinds of experiences that excite you. Choose as many as you like.',
+    type:  'multisel',
+    key:   'events',
+    options: [
+      { icon:'🍜', label:'Food Adventures' }, { icon:'🎨', label:'Art & Culture' },
+      { icon:'🏕️', label:'Outdoors'        }, { icon:'🎵', label:'Live Music'    },
+      { icon:'🧘', label:'Wellness'        }, { icon:'🍷', label:'Drinks & Wine' },
+      { icon:'🎭', label:'Comedy & Shows'  }, { icon:'🚀', label:'Tech & Ideas'  },
+      { icon:'📚', label:'Books & Talks'   }, { icon:'✈️', label:'Travel & Trips' },
+    ],
+  },
+  {
+    eyebrow: 'Step 4 of 7 — Vibe',
+    title: 'Your tribe vibe',
+    sub:   'What kind of group energy suits you best?',
+    type:  'multisel',
+    key:   'vibe',
+    options: [
+      { icon:'🤫', label:'Intimate (4–8)'    },
+      { icon:'👫', label:'Small (8–15)'      },
+      { icon:'🎉', label:'Social (15–30)'    },
+      { icon:'🏟️', label:'Big Energy (30+)' },
+      { icon:'🌀', label:'Mix it up'         },
+    ],
+  },
+  {
+    eyebrow: 'Step 5 of 7 — About you',
+    title: 'Who are you?',
+    sub:   'Help us find people in your season of life.',
+    type:  'chips',
+    groups: [
+      { label: 'Age group',    key: 'age',    options: ['20s','30s','40s','50s','60s+'] },
+      { label: 'Travel vibe',  key: 'travel', options: ['Local only','Day trips','Weekends away','International'] },
+    ],
+  },
+  {
+    eyebrow: 'Step 6 of 7 — Priorities',
+    title: 'What matters to you?',
+    sub:   'Tap to rank what makes an experience worth showing up for. First tap = top priority.',
+    type:  'rank',
+    key:   'priorities',
+    options: ['Good food & drink','Meeting new people','Learning something new','Getting outside','Creative output','Pure fun & laughs'],
+  },
+  {
+    eyebrow: 'Step 7 of 7 — Logistics',
+    title: 'Last bit — logistics',
+    sub:   'Tell us how you like to show up so we can match you well.',
+    type:  'sliders',
+    sliders: [
+      { label:'Weekly availability',    key:'avail', min:1, max:7,  val:2, unit:'days / week'   },
+      { label:'Ideal event frequency',  key:'freq',  min:1, max:12, val:2, unit:'events / month' },
+      { label:'Preferred group size',   key:'size',  min:2, max:50, val:10,unit:'people'         },
+    ],
+  },
+];
+
+/* ─── RENDER ──────────────────────────────────────────── */
+function render() {
+  const card = document.getElementById('onboardCard');
+  if (currentStep > TOTAL_STEPS) { renderSuccess(card); return; }
+
+  const step   = STEPS[currentStep - 1];
+  const pips   = Array.from({length: TOTAL_STEPS}, (_, i) => {
+    let cls = 'progress-pip';
+    if (i + 1 < currentStep) cls += ' done';
+    else if (i + 1 === currentStep) cls += ' current';
+    return `<div class="${cls}"></div>`;
+  }).join('');
+
+  card.innerHTML = `
+    <div class="progress-track">${pips}</div>
+    <div class="step-eyebrow">${step.eyebrow}</div>
+    <h2 class="step-title">${step.title}</h2>
+    <p class="step-sub">${step.sub}</p>
+    <div class="step-body">${renderBody(step)}</div>
+    <div class="step-nav">
+      <button class="btn-back" onclick="prevStep()" ${currentStep===1?'style="visibility:hidden"':''}>← Back</button>
+      <span class="step-counter">${currentStep} / ${TOTAL_STEPS}</span>
+      <button class="btn btn-primary" onclick="nextStep()">
+        ${currentStep === TOTAL_STEPS ? 'Finish →' : 'Continue →'}
+      </button>
+    </div>
+  `;
+}
+
+function renderBody(step) {
+  if (step.type === 'form') {
+    return `
+      <div class="form-group">
+        <label class="form-label">Tribe name</label>
+        <input class="form-input" id="f_tribe" placeholder="What will you call your tribe?" value="${saved.tribe_name||''}">
+      </div>
+      <div class="grid-2">
+        <div class="form-group">
+          <label class="form-label">Your name</label>
+          <input class="form-input" id="f_name" placeholder="First name" value="${saved.name||''}">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Email</label>
+          <input class="form-input" type="email" id="f_email" placeholder="you@example.com" value="${saved.email||''}">
+        </div>
+      </div>
+      <div class="grid-2">
+        <div class="form-group">
+          <label class="form-label">Phone</label>
+          <input class="form-input" id="f_phone" placeholder="+1 (555) 000-0000" value="${saved.phone||''}">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Zip code</label>
+          <input class="form-input" id="f_zip" placeholder="12345" value="${saved.zip||''}">
+        </div>
+      </div>
+    `;
+  }
+
+  if (step.type === 'yesno') {
+    const cur = saved[step.key] || '';
+    return `<div class="yn-grid">
+      ${step.options.map(o => `
+        <div class="yn-card ${cur===o.value?'selected':''}" onclick="toggleYN('${step.key}','${o.value}')">
+          <span class="yn-icon">${o.icon}</span>
+          <div class="yn-label">${o.label}</div>
+        </div>`).join('')}
+    </div>`;
+  }
+
+  if (step.type === 'multisel') {
+    const cur = saved[step.key] || [];
+    return `<div class="sel-grid">
+      ${step.options.map(o => `
+        <div class="sel-card ${cur.includes(o.label)?'selected':''}" onclick="toggleMulti('${step.key}','${o.label}')">
+          <span class="sel-icon">${o.icon}</span>
+          <div class="sel-label">${o.label}</div>
+        </div>`).join('')}
+    </div>`;
+  }
+
+  if (step.type === 'chips') {
+    return step.groups.map(g => {
+      const cur = (saved.chips && saved.chips[g.key]) || [];
+      return `
+        <div class="chip-section">
+          <div class="chip-section-label">${g.label}</div>
+          <div class="chip-row">
+            ${g.options.map(o => `
+              <div class="chip ${cur.includes(o)?'selected':''}" onclick="toggleChip('${g.key}','${o}')">${o}</div>
+            `).join('')}
+          </div>
+        </div>`;
+    }).join('');
+  }
+
+  if (step.type === 'rank') {
+    const ranked = saved[step.key] || [];
+    return `<div class="rank-list">
+      ${step.options.map(o => {
+        const idx = ranked.indexOf(o);
+        return `
+          <div class="rank-item ${idx>=0?'ranked':''}" onclick="toggleRank('${step.key}','${o}')">
+            <div class="rank-num">${idx>=0?idx+1:'—'}</div>
+            <div class="rank-label">${o}</div>
+          </div>`;
+      }).join('')}
+    </div>`;
+  }
+
+  if (step.type === 'sliders') {
+    return step.sliders.map(s => {
+      const val = (saved.sliders && saved.sliders[s.key]) || s.val;
+      return `
+        <div class="slider-block">
+          <div class="slider-header">
+            <span class="slider-label">${s.label}</span>
+            <span class="slider-val" id="sv_${s.key}">${val} ${s.unit}</span>
+          </div>
+          <input type="range" min="${s.min}" max="${s.max}" step="1" value="${val}"
+            oninput="updateSlider('${s.key}','${s.unit}',this.value)">
+        </div>`;
+    }).join('');
+  }
+  return '';
+}
+
+function renderSuccess(card) {
+  card.innerHTML = `
+    <div class="success-wrap">
+      <div class="success-icon">🔥</div>
+      <div class="success-title">You're in your tribe</div>
+      <p class="success-sub">We're finding your perfect communities right now. Something special is waiting for you.</p>
+      <a href="/tribes/explore/" class="btn btn-primary btn-lg">Enter Your Tribe →</a>
+    </div>`;
+}
+
+/* ─── INTERACTION HANDLERS ─────────────────────────────── */
+function collectFormStep() {
+  const t = document.getElementById('f_tribe');
+  const n = document.getElementById('f_name');
+  const e = document.getElementById('f_email');
+  const p = document.getElementById('f_phone');
+  const z = document.getElementById('f_zip');
+  if (t) saved.tribe_name = t.value;
+  if (n) saved.name  = n.value;
+  if (e) saved.email = e.value;
+  if (p) saved.phone = p.value;
+  if (z) saved.zip   = z.value;
+}
+
+function nextStep() {
+  if (currentStep === 1) collectFormStep();
+  currentStep = Math.min(currentStep + 1, TOTAL_STEPS + 1);
+  render();
+}
+function prevStep() {
+  currentStep = Math.max(currentStep - 1, 1);
+  render();
+}
+
+function toggleYN(key, val) {
+  saved[key] = val;
+  render();
+}
+function toggleMulti(key, val) {
+  if (!saved[key]) saved[key] = [];
+  const i = saved[key].indexOf(val);
+  if (i >= 0) saved[key].splice(i, 1); else saved[key].push(val);
+  render();
+}
+function toggleChip(groupKey, val) {
+  if (!saved.chips) saved.chips = {};
+  if (!saved.chips[groupKey]) saved.chips[groupKey] = [];
+  const i = saved.chips[groupKey].indexOf(val);
+  if (i >= 0) saved.chips[groupKey].splice(i, 1); else saved.chips[groupKey].push(val);
+  render();
+}
+function toggleRank(key, val) {
+  if (!saved[key]) saved[key] = [];
+  const i = saved[key].indexOf(val);
+  if (i >= 0) saved[key].splice(i, 1); else saved[key].push(val);
+  render();
+}
+function updateSlider(key, unit, value) {
+  if (!saved.sliders) saved.sliders = {};
+  saved.sliders[key] = parseInt(value);
+  const el = document.getElementById('sv_' + key);
+  if (el) el.textContent = value + ' ' + unit;
+}
+
+/* ─── INIT ─────────────────────────────────────────────── */
+render();
+</script>
+{% endblock %}
