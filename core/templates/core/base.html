@@ -429,6 +429,132 @@ body {
 /* Fade-in-up — shared scroll animation */
 .fade-in-up { opacity: 0; transform: translateY(28px); transition: opacity 0.6s ease, transform 0.6s ease; }
 .fade-in-up.visible { opacity: 1; transform: translateY(0); }
+
+/* ══════════════════════════════════════════
+   HAMBURGER MENU — Mobile Navbar
+   ══════════════════════════════════════════ */
+
+/* Hamburger button — hidden on desktop */
+.nav-hamburger {
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 5px;
+  width: 40px;
+  height: 40px;
+  background: none;
+  border: 1.5px solid rgba(255,255,255,0.2);
+  border-radius: var(--r-btn);
+  cursor: pointer;
+  padding: 0;
+  flex-shrink: 0;
+  transition: border-color var(--t-base), background var(--t-base);
+}
+.nav-hamburger:hover {
+  border-color: rgba(255,255,255,0.45);
+  background: rgba(255,255,255,0.07);
+}
+
+/* The three bars */
+.nav-hamburger span {
+  display: block;
+  width: 18px;
+  height: 2px;
+  background: rgba(255,255,255,0.85);
+  border-radius: 2px;
+  transition: transform 0.3s ease, opacity 0.3s ease, width 0.3s ease;
+  transform-origin: center;
+}
+
+/* Animate bars into an X when open */
+.nav-hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+.nav-hamburger.open span:nth-child(2) { opacity: 0; width: 0; }
+.nav-hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+/* Mobile drawer — slides down from navbar */
+.nav-mobile-menu {
+  display: none; /* shown only on mobile */
+  position: fixed;
+  top: 68px; /* navbar height */
+  left: 0; right: 0;
+  background: var(--secondary);
+  z-index: 499;
+  border-top: 1px solid rgba(255,255,255,0.08);
+  box-shadow: 0 12px 32px rgba(20,30,26,0.28);
+  /* Slide in/out animation */
+  transform: translateY(-8px);
+  opacity: 0;
+  pointer-events: none;
+  transition: transform 0.25s cubic-bezier(0.4,0,0.2,1), opacity 0.25s ease;
+}
+.nav-mobile-menu.open {
+  transform: translateY(0);
+  opacity: 1;
+  pointer-events: all;
+}
+
+/* Links in the mobile drawer */
+.nav-mobile-links {
+  display: flex;
+  flex-direction: column;
+  padding: 12px 16px 8px;
+  gap: 2px;
+}
+.nav-mobile-link {
+  color: rgba(255,255,255,0.72);
+  font-size: 15px;
+  font-weight: 500;
+  text-decoration: none;
+  padding: 12px 14px;
+  border-radius: var(--r-btn);
+  transition: color var(--t-fast), background var(--t-fast);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.nav-mobile-link:hover  { color: #fff; background: rgba(255,255,255,0.07); }
+.nav-mobile-link.active { color: #fff; background: rgba(255,255,255,0.10); font-weight: 600; }
+
+/* Mobile auth buttons row */
+.nav-mobile-actions {
+  display: flex;
+  gap: 10px;
+  padding: 12px 16px 18px;
+  border-top: 1px solid rgba(255,255,255,0.08);
+  margin-top: 4px;
+}
+.nav-mobile-actions .nav-btn-ghost,
+.nav-mobile-actions .nav-btn-solid,
+.nav-mobile-actions .nav-cta {
+  flex: 1;
+  justify-content: center;
+}
+
+/* Overlay to close menu on outside tap */
+.nav-mobile-overlay {
+  display: none;
+  position: fixed;
+  inset: 68px 0 0 0;
+  z-index: 498;
+  background: transparent;
+}
+.nav-mobile-overlay.open { display: block; }
+
+/* ── Responsive breakpoint ── */
+@media (max-width: 768px) {
+  .navbar { padding: 0 20px; }
+
+  /* Hide desktop nav elements */
+  .nav-centre { display: none; }
+  .nav-right   { display: none; }
+
+  /* Show hamburger */
+  .nav-hamburger { display: flex; }
+
+  /* Show mobile drawer container */
+  .nav-mobile-menu { display: block; }
+}
 </style>
 {% block extra_head %}{% endblock %}
 </head>
@@ -454,6 +580,13 @@ body {
       <a href="{% url 'my_events' %}" class="nav-link {% block nav_my_events %}{% endblock %}">My Events</a>
     {% endif %}
   </div>
+
+  <!-- HAMBURGER: Mobile only -->
+  <button class="nav-hamburger" id="navHamburger" aria-label="Toggle menu" aria-expanded="false">
+    <span></span>
+    <span></span>
+    <span></span>
+  </button>
 
   <!-- RIGHT: Auth-aware action cluster -->
   <div class="nav-right">
@@ -515,6 +648,46 @@ body {
   </div>
 </nav>
 
+<!-- ════════════════════════════════════════
+     MOBILE MENU DRAWER
+     ════════════════════════════════════════ -->
+<div class="nav-mobile-overlay" id="navOverlay"></div>
+<div class="nav-mobile-menu" id="navMobileMenu" aria-hidden="true">
+  <div class="nav-mobile-links">
+    <a href="{% url 'explore' %}" class="nav-mobile-link {% block mob_explore %}{% endblock %}">
+      🔍 Explore Tribes
+    </a>
+    <a href="{% url 'explore_events' %}" class="nav-mobile-link {% block mob_events %}{% endblock %}">
+      📅 Explore Events
+    </a>
+    {% if user.is_authenticated %}
+      <a href="{% url 'my_tribes' %}" class="nav-mobile-link {% block mob_my_tribes %}{% endblock %}">
+        🔥 My Tribes
+      </a>
+      <a href="{% url 'my_events' %}" class="nav-mobile-link {% block mob_my_events %}{% endblock %}">
+        🗓️ My Events
+      </a>
+      <a href="{% url 'my_profile' %}" class="nav-mobile-link {% block mob_profile %}{% endblock %}">
+        👤 My Profile
+      </a>
+    {% endif %}
+  </div>
+  <div class="nav-mobile-actions">
+    {% if user.is_authenticated %}
+      <a href="{% url 'onboarding' %}" class="nav-cta">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="7" cy="7" r="6"/><line x1="7" y1="4" x2="7" y2="10"/><line x1="4" y1="7" x2="10" y2="7"/>
+        </svg>
+        Create Tribe
+      </a>
+      <a href="{% url 'logout' %}" class="nav-btn-ghost">Sign Out</a>
+    {% else %}
+      <a href="{% url 'login' %}"  class="nav-btn-ghost">Sign In</a>
+      <a href="{% url 'signup' %}" class="nav-btn-solid">Sign Up</a>
+    {% endif %}
+  </div>
+</div>
+
 {% if messages %}
 <ul class="messages-list">
   {% for message in messages %}
@@ -557,8 +730,51 @@ document.addEventListener('click', function(e) {
 
 /* Close on Escape */
 document.addEventListener('keydown', function(e) {
-  if (e.key === 'Escape') closeDropdown();
+  if (e.key === 'Escape') { closeDropdown(); closeMobileMenu(); }
 });
+
+/* ── Mobile hamburger menu ── */
+function closeMobileMenu() {
+  const hamburger = document.getElementById('navHamburger');
+  const menu      = document.getElementById('navMobileMenu');
+  const overlay   = document.getElementById('navOverlay');
+  if (!hamburger || !menu) return;
+  hamburger.classList.remove('open');
+  hamburger.setAttribute('aria-expanded', 'false');
+  menu.classList.remove('open');
+  menu.setAttribute('aria-hidden', 'true');
+  overlay.classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+(function () {
+  const hamburger = document.getElementById('navHamburger');
+  const menu      = document.getElementById('navMobileMenu');
+  const overlay   = document.getElementById('navOverlay');
+  if (!hamburger || !menu) return;
+
+  hamburger.addEventListener('click', function () {
+    const isOpen = menu.classList.contains('open');
+    if (isOpen) {
+      closeMobileMenu();
+    } else {
+      hamburger.classList.add('open');
+      hamburger.setAttribute('aria-expanded', 'true');
+      menu.classList.add('open');
+      menu.setAttribute('aria-hidden', 'false');
+      overlay.classList.add('open');
+      document.body.style.overflow = 'hidden';
+    }
+  });
+
+  /* Close when tapping the overlay */
+  overlay.addEventListener('click', closeMobileMenu);
+
+  /* Close mobile menu if window resizes to desktop */
+  window.addEventListener('resize', function () {
+    if (window.innerWidth > 768) closeMobileMenu();
+  });
+})();
 </script>
 
 {% block extra_js %}{% endblock %}
