@@ -4,13 +4,14 @@
 
 {% block extra_head %}
 <style>
+/* ══════════════════════════════════════════
+   EXPLORE TRIBES PAGE
+   ══════════════════════════════════════════ */
+
 .explore-hero {
-  padding: 112px 0 48px;
+  padding: 108px 0 44px;
   background: var(--surface);
   border-bottom: 1px solid var(--border);
-}
-.explore-hero-inner {
-  max-width: 680px;
 }
 .explore-eyebrow {
   font-size: 11px; font-weight: 800; letter-spacing: 2.5px;
@@ -18,8 +19,8 @@
 }
 .explore-title {
   font-family: var(--font-display);
-  font-size: clamp(34px, 5vw, 52px);
-  font-weight: 800; letter-spacing: -2px; line-height: 1.08;
+  font-size: clamp(34px, 5vw, 52px); font-weight: 800;
+  letter-spacing: -2px; line-height: 1.08;
   color: var(--text-primary); margin-bottom: 14px;
 }
 .explore-sub {
@@ -27,28 +28,31 @@
   line-height: 1.7; max-width: 480px;
 }
 
-/* ── GRID ── */
-.tribes-section { padding: 56px 0 80px; }
-
+/* ── TRIBE GRID ─────────────────────────────────────────── */
+.tribes-section { padding: 52px 0 80px; }
 .tribes-wrap { position: relative; }
-
 .tribes-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(288px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
   gap: 24px;
 }
 
-/* ── TRIBE CARD ── */
+/* ── TRIBE CARD ─────────────────────────────────────────── */
 .tribe-card {
   background: var(--surface);
   border-radius: var(--r-card);
   padding: 24px;
   box-shadow: var(--shadow-card);
-  transition: transform var(--t-base), box-shadow var(--t-base);
   cursor: pointer;
   position: relative;
   overflow: hidden;
+  opacity: 0;
+  transform: translateY(18px);
+  transition: transform var(--t-base), box-shadow var(--t-base), opacity 0.4s ease;
 }
+.tribe-card.visible { opacity: 1; transform: translateY(0); }
+
+/* Accent top bar on hover */
 .tribe-card::before {
   content: '';
   position: absolute; top: 0; left: 0; right: 0; height: 3px;
@@ -59,9 +63,9 @@
 .tribe-card:hover::before { opacity: 1; }
 
 .tribe-avatar {
-  width: 54px; height: 54px; border-radius: 14px;
+  width: 52px; height: 52px; border-radius: 14px;
   display: flex; align-items: center; justify-content: center;
-  font-size: 26px; margin-bottom: 16px; flex-shrink: 0;
+  font-size: 24px; margin-bottom: 16px;
 }
 .tribe-name {
   font-family: var(--font-display);
@@ -73,7 +77,6 @@
   line-height: 1.65; margin-bottom: 16px;
 }
 .tribe-tags { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 18px; }
-
 .tribe-footer {
   display: flex; align-items: center; justify-content: space-between;
   padding-top: 16px; border-top: 1px solid var(--border);
@@ -91,107 +94,208 @@
 }
 .member-pip:first-child { margin-left: 0; }
 
-.tribe-join {
-  background: transparent; color: var(--primary);
-  border: 1.5px solid var(--primary);
+/* "Explore" button — replaces "Join" */
+.tribe-explore-btn {
+  background: transparent; color: var(--secondary);
+  border: 1.5px solid var(--secondary);
   padding: 7px 16px; border-radius: var(--r-sm);
   font-size: 13px; font-weight: 700; cursor: pointer;
   font-family: var(--font-body);
   transition: background var(--t-fast), color var(--t-fast), transform var(--t-fast);
+  display: inline-flex; align-items: center; gap: 5px;
 }
-.tribe-join:hover { background: var(--primary); color: #fff; transform: translateY(-1px); }
+.tribe-explore-btn:hover { background: var(--secondary); color: #fff; transform: translateY(-1px); }
 
-/* ── BLUR / GATE OVERLAY ── */
+/* ── GATE OVERLAY (unauthenticated blur) ─────────────────── */
 .gate-overlay {
-  position: absolute; bottom: 0; left: 0; right: 0; height: 300px;
-  background: linear-gradient(to bottom, transparent 0%, var(--bg) 68%);
+  position: absolute; bottom: 0; left: 0; right: 0; height: 280px;
+  background: linear-gradient(to bottom, transparent 0%, var(--bg) 65%);
   display: flex; align-items: flex-end; justify-content: center;
   padding-bottom: 36px; z-index: 10; pointer-events: none;
 }
 .gate-overlay .gate-btn { pointer-events: all; }
 
-/* ── MODAL ── */
+/* ══════════════════════════════════════════
+   TRIBE DETAIL MODAL
+   ══════════════════════════════════════════ */
 .modal-backdrop {
   position: fixed; inset: 0;
-  background: rgba(30,20,12,0.52);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+  background: rgba(26,17,10,0.55);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   z-index: 900;
   display: flex; align-items: center; justify-content: center;
-  opacity: 0; animation: bdIn 0.22s ease forwards;
+  padding: 24px;
+  opacity: 0; animation: bdIn 0.2s ease forwards;
 }
 @keyframes bdIn { to { opacity: 1; } }
 
-.modal {
+.modal-box {
   background: var(--surface);
   border-radius: var(--r-xl);
-  padding: 52px 44px;
-  max-width: 460px; width: 92%;
-  text-align: center;
+  max-width: 520px; width: 100%;
   box-shadow: var(--shadow-float);
   position: relative;
-  transform: scale(0.88) translateY(24px);
-  animation: modalIn 0.4s cubic-bezier(0.34,1.45,0.64,1) 0.08s forwards;
+  transform: scale(0.92) translateY(20px);
+  animation: boxIn 0.38s cubic-bezier(0.22, 1, 0.36, 1) 0.06s forwards;
+  overflow: hidden;
 }
-@keyframes modalIn { to { transform: scale(1) translateY(0); } }
+@keyframes boxIn { to { transform: scale(1) translateY(0); } }
+
+/* Coloured top strip inside modal */
+.modal-strip {
+  height: 6px;
+  background: var(--primary-gradient);
+}
+
+.modal-body { padding: 36px 40px 40px; }
 
 .modal-close {
+  position: absolute; top: 18px; right: 18px;
+  width: 32px; height: 32px; border-radius: 50%;
+  background: var(--surface-low); border: none; cursor: pointer;
+  color: var(--text-secondary); font-size: 16px;
+  display: flex; align-items: center; justify-content: center;
+  transition: background var(--t-fast), color var(--t-fast);
+  z-index: 1;
+}
+.modal-close:hover { background: var(--surface-mid); color: var(--text-primary); }
+
+/* Modal header row */
+.modal-header {
+  display: flex; align-items: flex-start; gap: 16px; margin-bottom: 20px;
+}
+.modal-avatar {
+  width: 60px; height: 60px; border-radius: 16px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 28px; flex-shrink: 0;
+}
+.modal-tribe-name {
+  font-family: var(--font-display);
+  font-size: 22px; font-weight: 800; letter-spacing: -0.8px;
+  color: var(--text-primary); margin-bottom: 6px;
+}
+.modal-tribe-meta {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 13px; color: var(--text-secondary);
+}
+.meta-dot { width: 4px; height: 4px; border-radius: 50%; background: var(--border); }
+
+.modal-desc {
+  font-size: 15px; color: var(--text-secondary);
+  line-height: 1.75; margin-bottom: 22px;
+}
+
+.modal-tags { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 24px; }
+
+/* Activity preview strip */
+.modal-activity {
+  background: var(--surface-low);
+  border-radius: var(--r-card);
+  padding: 16px 18px;
+  margin-bottom: 28px;
+}
+.modal-activity-title {
+  font-size: 11px; font-weight: 800; letter-spacing: 1.8px;
+  text-transform: uppercase; color: var(--text-muted); margin-bottom: 12px;
+}
+.activity-items { display: flex; flex-direction: column; gap: 8px; }
+.activity-item {
+  display: flex; align-items: center; gap: 10px;
+  font-size: 14px; color: var(--text-secondary);
+}
+.activity-dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: var(--primary); flex-shrink: 0; opacity: 0.7;
+}
+
+.modal-actions { display: flex; gap: 10px; }
+
+/* ══════════════════════════════════════════
+   GATE POPUP (unauthenticated only)
+   ══════════════════════════════════════════ */
+.gate-popup-backdrop {
+  position: fixed; inset: 0;
+  background: rgba(26,17,10,0.55);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  z-index: 910;
+  display: flex; align-items: center; justify-content: center;
+  padding: 24px;
+  opacity: 0; animation: bdIn 0.2s ease forwards;
+}
+.gate-popup {
+  background: var(--surface);
+  border-radius: var(--r-xl);
+  max-width: 440px; width: 100%;
+  text-align: center;
+  padding: 52px 44px;
+  box-shadow: var(--shadow-float);
+  position: relative;
+  transform: scale(0.9) translateY(24px);
+  animation: boxIn 0.4s cubic-bezier(0.22,1,0.36,1) 0.06s forwards;
+}
+.gate-popup-close {
   position: absolute; top: 16px; right: 16px;
   width: 32px; height: 32px; border-radius: 50%;
-  background: none; border: none; cursor: pointer;
-  color: var(--text-muted); font-size: 18px;
+  background: var(--surface-low); border: none; cursor: pointer;
+  color: var(--text-secondary); font-size: 16px;
   display: flex; align-items: center; justify-content: center;
-  transition: background var(--t-fast);
 }
-.modal-close:hover { background: var(--surface-low); }
+.gate-popup-close:hover { background: var(--surface-mid); }
 
-.modal-icon { font-size: 52px; margin-bottom: 18px; display: block; }
-.modal-title {
+.gate-popup-eyebrow {
+  font-size: 11px; font-weight: 800; letter-spacing: 2px;
+  text-transform: uppercase; color: var(--primary); margin-bottom: 14px;
+}
+.gate-popup-title {
   font-family: var(--font-display);
-  font-size: 30px; font-weight: 800; letter-spacing: -1.2px;
+  font-size: 28px; font-weight: 800; letter-spacing: -1px;
   color: var(--text-primary); margin-bottom: 12px;
 }
-.modal-sub {
+.gate-popup-sub {
   font-size: 15px; color: var(--text-secondary);
-  line-height: 1.7; margin-bottom: 32px;
+  line-height: 1.7; margin-bottom: 32px; max-width: 340px; margin-left: auto; margin-right: auto;
 }
-.modal-actions { display: flex; flex-direction: column; gap: 10px; }
+.gate-popup-actions { display: flex; flex-direction: column; gap: 10px; }
 
-/* Card animations */
-.tribe-card { opacity: 0; transform: translateY(18px); }
-.tribe-card.visible {
-  transition: opacity 0.4s ease, transform 0.4s ease;
-  opacity: 1; transform: translateY(0);
-}
-
-@media (max-width: 768px) {
+@media (max-width: 640px) {
   .tribes-grid { grid-template-columns: 1fr; }
-  .modal { padding: 36px 28px; }
+  .modal-body { padding: 28px 24px 32px; }
+  .modal-actions { flex-direction: column; }
+  .gate-popup { padding: 40px 28px; }
 }
 </style>
 {% endblock %}
 
 {% block content %}
-<!-- HERO BAR -->
+
+<!-- HERO -->
 <section class="explore-hero">
   <div class="container">
-    <div class="explore-hero-inner">
-      <div class="explore-eyebrow">Discover</div>
-      <h1 class="explore-title">Explore Tribes</h1>
-      <p class="explore-sub">Browse communities built around real experiences, real places, and people who show up.</p>
-    </div>
+    <div class="explore-eyebrow">Discover</div>
+    <h1 class="explore-title">Explore Tribes</h1>
+    <p class="explore-sub">Browse communities built around real experiences, real places, and people who actually show up.</p>
   </div>
 </section>
 
-<!-- TRIBES GRID -->
+<!-- TRIBE CARDS GRID -->
 <section class="tribes-section">
   <div class="container">
     <div class="tribes-wrap">
-      <div class="tribes-grid" id="tribesGrid">
 
+      <div class="tribes-grid" id="tribesGrid">
         {% for tribe in tribes %}
-        <div class="tribe-card" data-index="{{ forloop.counter0 }}">
-          <div class="tribe-avatar" style="background: {{ tribe.icon_bg|default:'#FDBA9A' }}">
+        <div class="tribe-card"
+             data-index="{{ forloop.counter0 }}"
+             data-name="{{ tribe.name }}"
+             data-desc="{{ tribe.description }}"
+             data-icon="{{ tribe.icon }}"
+             data-icon-bg="{{ tribe.icon_bg|default:'#FDBA9A' }}"
+             data-tags="{{ tribe.tags }}"
+             data-members="{{ tribe.members }}">
+
+          <div class="tribe-avatar" style="background:{{ tribe.icon_bg|default:'#FDBA9A' }}">
             {{ tribe.icon }}
           </div>
           <div class="tribe-name">{{ tribe.name }}</div>
@@ -206,70 +310,204 @@
               <div class="member-stack">
                 <div class="member-pip" style="background:#E76F51">A</div>
                 <div class="member-pip" style="background:#264653">B</div>
-                <div class="member-pip" style="background:#E9C46A; color:#5c4700">C</div>
+                <div class="member-pip" style="background:#C9A130;color:#fff">C</div>
               </div>
               <span>{{ tribe.members }} members</span>
             </div>
-            <button class="tribe-join" onclick="handleJoin(event)">Join</button>
+            <!-- Explore button — opens tribe detail modal -->
+            <button class="tribe-explore-btn" onclick="openTribeModal(this, event)">
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="6" r="5"/><path d="M6 4v4M4 6h4"/></svg>
+              Explore
+            </button>
           </div>
         </div>
         {% empty %}
-        <p style="color:var(--text-muted);font-size:15px;grid-column:1/-1">No tribes yet — be the first to create one!</p>
+        <p style="color:var(--text-muted);font-size:15px;grid-column:1/-1;padding:24px 0">
+          No tribes yet — be the first to <a href="{% url 'onboarding' %}" style="color:var(--primary);font-weight:600">create one</a>!
+        </p>
         {% endfor %}
-
-      </div><!-- /tribes-grid -->
-
-      <!-- GATE OVERLAY (shown after ~8 cards) -->
-      <div class="gate-overlay" id="gateOverlay">
-        <button class="btn btn-primary gate-btn" onclick="openModal()">See all tribes →</button>
       </div>
 
-    </div><!-- /tribes-wrap -->
+      <!-- Gate overlay — only visible to unauthenticated users -->
+      {% if not user.is_authenticated %}
+      <div class="gate-overlay" id="gateOverlay">
+        <button class="btn btn-primary gate-btn" onclick="openGatePopup()">See all tribes →</button>
+      </div>
+      {% endif %}
+
+    </div>
   </div>
 </section>
 
-<!-- MODAL -->
-<div class="modal-backdrop" id="modal" style="display:none" onclick="backdropClose(event)">
-  <div class="modal">
-    <button class="modal-close" onclick="closeModal()" aria-label="Close">✕</button>
-    <span class="modal-icon">👀</span>
-    <div class="modal-title">Your tribe is waiting</div>
-    <p class="modal-sub">You've seen enough to be curious. Now find people who actually get you — not just anyone nearby.</p>
-    <div class="modal-actions">
+
+<!-- ══════════════════════════════════════════
+     TRIBE DETAIL MODAL
+     ══════════════════════════════════════════ -->
+<div id="tribeModal" class="modal-backdrop" style="display:none" onclick="closeTribeModalBackdrop(event)">
+  <div class="modal-box">
+    <div class="modal-strip"></div>
+    <button class="modal-close" onclick="closeTribeModal()" aria-label="Close">✕</button>
+    <div class="modal-body">
+
+      <div class="modal-header">
+        <div class="modal-avatar" id="modalAvatar"></div>
+        <div>
+          <div class="modal-tribe-name" id="modalName"></div>
+          <div class="modal-tribe-meta">
+            <span id="modalMembers"></span>
+            <div class="meta-dot"></div>
+            <span id="modalCategory"></span>
+          </div>
+        </div>
+      </div>
+
+      <p class="modal-desc" id="modalDesc"></p>
+
+      <div class="modal-tags" id="modalTags"></div>
+
+      <!-- Activity preview -->
+      <div class="modal-activity">
+        <div class="modal-activity-title">Recent Activity</div>
+        <div class="activity-items" id="modalActivity"></div>
+      </div>
+
+      <div class="modal-actions" id="modalActions">
+        <!-- Injected by JS depending on auth state -->
+      </div>
+
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════
+     GATE POPUP — only for unauthenticated
+     ══════════════════════════════════════════ -->
+{% if not user.is_authenticated %}
+<div id="gatePopup" class="gate-popup-backdrop" style="display:none" onclick="closeGateBackdrop(event)">
+  <div class="gate-popup">
+    <button class="gate-popup-close" onclick="closeGatePopup()">✕</button>
+    <div class="gate-popup-eyebrow">You're getting warm</div>
+    <div class="gate-popup-title">Your tribe is waiting</div>
+    <p class="gate-popup-sub">You've seen enough to know this is for you. Now find the people who actually get it.</p>
+    <div class="gate-popup-actions">
       <a href="{% url 'onboarding' %}" class="btn btn-primary btn-full">Join Your Tribe</a>
       <a href="{% url 'login' %}" class="btn btn-outline btn-full">I already belong</a>
     </div>
   </div>
 </div>
+{% endif %}
+
 {% endblock %}
 
 {% block extra_js %}
 <script>
-// Staggered card entrance
-const cards = document.querySelectorAll('.tribe-card');
-cards.forEach((card, i) => {
-  setTimeout(() => card.classList.add('visible'), i * 65);
+const IS_AUTH = {{ user.is_authenticated|yesno:"true,false" }};
+
+/* ── Staggered card entrance ─────────────────────────── */
+document.querySelectorAll('.tribe-card').forEach((card, i) => {
+  setTimeout(() => card.classList.add('visible'), i * 70);
 });
 
-// Auto-open modal after 5s
-let modalOpened = false;
-setTimeout(() => { if (!modalOpened) openModal(); }, 5000);
+/* ── Gate popup — only for guests, after 6s ─────────── */
+let gateOpened = false;
+if (!IS_AUTH) {
+  setTimeout(() => { if (!gateOpened) openGatePopup(); }, 6000);
+}
 
-function handleJoin(e) {
+function openGatePopup() {
+  gateOpened = true;
+  const el = document.getElementById('gatePopup');
+  if (el) el.style.display = 'flex';
+}
+function closeGatePopup() {
+  const el = document.getElementById('gatePopup');
+  if (el) el.style.display = 'none';
+}
+function closeGateBackdrop(e) {
+  if (e.target === document.getElementById('gatePopup')) closeGatePopup();
+}
+
+/* ── Activity previews per tribe ─────────────────────── */
+const ACTIVITIES = [
+  ['New member joined', 'Posted a food walk route', 'Weekend event scheduled'],
+  ['Gallery visit confirmed', 'New photo shared', 'Dinner reservation made'],
+  ['Trail map uploaded', 'Weekend hike planned', '3 new members joined'],
+  ['Thursday session booked', 'New sketch shared', 'Member milestone hit'],
+  ['Monthly book chosen', 'Reading schedule posted', 'Dinner venue confirmed'],
+  ['New taco spot voted', 'Tuesday event set', 'Menu reviewed'],
+  ['Morning route updated', 'New cyclist joined', 'Coffee spot pinned'],
+  ['Gig tickets shared', 'Venue confirmed', 'Pre-show meet added'],
+  ['New bottle reviewed', 'Tasting notes posted', 'Next session scheduled'],
+  ['Swim route updated', 'Safety brief shared', 'New dip spot found'],
+];
+
+/* ── Open tribe detail modal ─────────────────────────── */
+function openTribeModal(btn, e) {
   e.stopPropagation();
-  openModal();
+
+  // If guest hit limit → show gate instead
+  if (!IS_AUTH) {
+    const cards = document.querySelectorAll('.tribe-card');
+    const idx = parseInt(btn.closest('.tribe-card').dataset.index, 10);
+    if (idx >= 7) { openGatePopup(); return; }
+  }
+
+  const card = btn.closest('.tribe-card');
+  const idx  = parseInt(card.dataset.index, 10);
+  const name    = card.dataset.name;
+  const desc    = card.dataset.desc;
+  const icon    = card.dataset.icon;
+  const iconBg  = card.dataset.iconBg;
+  const tags    = card.dataset.tags.split(',').map(t => t.trim()).filter(Boolean);
+  const members = card.dataset.members;
+
+  // Populate modal
+  document.getElementById('modalAvatar').style.background = iconBg;
+  document.getElementById('modalAvatar').textContent = icon;
+  document.getElementById('modalName').textContent = name;
+  document.getElementById('modalMembers').textContent = members + ' members';
+  document.getElementById('modalCategory').textContent = tags[0] || 'Community';
+  document.getElementById('modalDesc').textContent = desc;
+
+  // Tags
+  const tagsEl = document.getElementById('modalTags');
+  tagsEl.innerHTML = tags.map(t => `<span class="tag">${t}</span>`).join('');
+
+  // Activity
+  const acts = ACTIVITIES[idx % ACTIVITIES.length] || ACTIVITIES[0];
+  document.getElementById('modalActivity').innerHTML = acts
+    .map(a => `<div class="activity-item"><div class="activity-dot"></div><span>${a}</span></div>`)
+    .join('');
+
+  // CTA — auth-aware
+  const actionsEl = document.getElementById('modalActions');
+  if (IS_AUTH) {
+    actionsEl.innerHTML = `
+      <button class="btn btn-primary" style="flex:1" onclick="joinTribeAction()">Join Now</button>
+      <button class="btn btn-secondary" style="flex:1" onclick="closeTribeModal()">Maybe Later</button>`;
+  } else {
+    actionsEl.innerHTML = `
+      <a href="{% url 'onboarding' %}" class="btn btn-primary" style="flex:1">Join Now</a>
+      <a href="{% url 'login' %}"     class="btn btn-secondary" style="flex:1">Sign In First</a>`;
+  }
+
+  document.getElementById('tribeModal').style.display = 'flex';
+  document.body.style.overflow = 'hidden';
 }
 
-function openModal() {
-  modalOpened = true;
-  const m = document.getElementById('modal');
-  m.style.display = 'flex';
+function closeTribeModal() {
+  document.getElementById('tribeModal').style.display = 'none';
+  document.body.style.overflow = '';
 }
-function closeModal() {
-  document.getElementById('modal').style.display = 'none';
+function closeTribeModalBackdrop(e) {
+  if (e.target === document.getElementById('tribeModal')) closeTribeModal();
 }
-function backdropClose(e) {
-  if (e.target === document.getElementById('modal')) closeModal();
+
+function joinTribeAction() {
+  // Can wire to POST /tribes/join/<id>/ when ids are in data attributes
+  closeTribeModal();
+  alert('Welcome to the tribe! 🔥');
 }
 </script>
 {% endblock %}

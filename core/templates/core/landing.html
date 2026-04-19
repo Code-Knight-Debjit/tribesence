@@ -4,130 +4,199 @@
 
 {% block extra_head %}
 <style>
-/* ── HERO ─────────────────────────────────────────────────── */
+/* ══════════════════════════════════════════
+   HERO — Premium, calm, deliberate
+   ══════════════════════════════════════════ */
 .hero {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 64px 48px 48px;
+  padding: 80px 48px 64px;
   position: relative;
   overflow: hidden;
 }
 
+/* Deep layered background — more weight, less flat */
 .hero-bg {
-  position: absolute; inset: 0;
+  position: absolute; inset: 0; z-index: 0;
   background:
-    radial-gradient(ellipse 80% 55% at 50% 28%, rgba(231,111,81,0.08) 0%, transparent 70%),
-    radial-gradient(ellipse 55% 38% at 80% 72%, rgba(38,70,83,0.05) 0%, transparent 60%),
+    radial-gradient(ellipse 90% 65% at 50% 20%, rgba(231,111,81,0.055) 0%, transparent 68%),
+    radial-gradient(ellipse 60% 50% at 15% 80%, rgba(38,70,83,0.06) 0%, transparent 60%),
+    radial-gradient(ellipse 50% 40% at 85% 75%, rgba(233,196,106,0.04) 0%, transparent 55%),
     var(--bg);
-  z-index: 0;
 }
+
+/* Subtle grain for texture — stays from existing code */
 .hero-bg::after {
   content: '';
-  position: absolute; inset: 0;
-  opacity: 0.025;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)'/%3E%3C/svg%3E");
+  position: absolute; inset: 0; opacity: 0.03;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.82' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* Horizontal depth line — adds visual grounding */
+.hero-ground {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(38,70,83,0.12) 30%, rgba(38,70,83,0.12) 70%, transparent);
+  z-index: 1;
 }
 
 .hero-inner {
   position: relative; z-index: 2;
   text-align: center;
-  max-width: 760px;
+  max-width: 800px;
   width: 100%;
 }
 
+/* ── ILLUSTRATION STAGE ─────────────────────────────────── */
 .stage {
-  width: 560px;
-  height: 230px;
+  width: 600px;
+  height: 240px;
   position: relative;
-  margin: 0 auto 36px;
+  margin: 0 auto 52px;   /* more breathing room below */
 }
 
+/* Subtle ground shadow — anchors figures to the scene */
+.stage-ground {
+  position: absolute;
+  bottom: 0; left: 50%;
+  transform: translateX(-50%);
+  width: 420px; height: 28px;
+  background: radial-gradient(ellipse 100% 100% at 50% 100%, rgba(38,70,83,0.1) 0%, transparent 70%);
+  border-radius: 50%;
+}
+
+/* ── LEFT FIGURE — slow, elegant entrance ──────────────── */
 .char-solo {
   position: absolute;
-  left: 20px;
-  bottom: 0;
-  transform: translateX(-160px);
+  left: 32px;
+  bottom: 6px;
   opacity: 0;
-  animation: slideFromLeft 0.85s cubic-bezier(0.34,1.45,0.64,1) 0.25s forwards;
+  transform: translateX(-80px) translateY(8px);
+  /* Slower, no spring bounce — deliberate ease-out */
+  animation: enterLeft 1.1s cubic-bezier(0.22, 1, 0.36, 1) 0.2s forwards;
 }
 
+@keyframes enterLeft {
+  to { opacity: 1; transform: translateX(0) translateY(0); }
+}
+
+/* Wave: gentle, 3 cycles, eases out — not frantic */
 .wave-arm {
-  transform-origin: 88px 95px;
-  animation:
-    slideFromLeft 0.85s cubic-bezier(0.34,1.45,0.64,1) 0.25s forwards,
-    waveHand 0.5s ease-in-out 1.2s 4 alternate;
+  transform-origin: 30px 72px;
+  animation: gentleWave 1.6s cubic-bezier(0.45, 0, 0.55, 1) 1.5s 3 alternate;
 }
 
-@keyframes waveHand {
+@keyframes gentleWave {
   from { transform: rotate(0deg); }
-  to   { transform: rotate(-28deg); }
+  to   { transform: rotate(-22deg); }
 }
 
-@keyframes slideFromLeft {
-  to { transform: translateX(0); opacity: 1; }
-}
-
+/* ── RIGHT GROUP — slow, offset slightly later ─────────── */
 .char-group {
   position: absolute;
-  right: 10px;
-  bottom: 0;
-  transform: translateX(160px);
+  right: 18px;
+  bottom: 6px;
   opacity: 0;
-  animation: slideFromRight 0.85s cubic-bezier(0.34,1.45,0.64,1) 0.25s forwards;
+  transform: translateX(80px) translateY(8px);
+  animation: enterRight 1.1s cubic-bezier(0.22, 1, 0.36, 1) 0.38s forwards;
 }
 
-@keyframes slideFromRight {
-  to { transform: translateX(0); opacity: 1; }
+@keyframes enterRight {
+  to { opacity: 1; transform: translateX(0) translateY(0); }
 }
 
+/* ── TEXT — fades up gently, after figures settle ────────── */
 .hero-text {
   opacity: 0;
-  transform: translateY(22px);
-  animation: fadeUp 0.6s ease 1.25s forwards;
+  transform: translateY(16px);
+  animation: textReveal 0.9s cubic-bezier(0.22, 1, 0.36, 1) 1.4s forwards;
 }
 
-@keyframes fadeUp {
+@keyframes textReveal {
   to { opacity: 1; transform: translateY(0); }
 }
 
+/* ── HEADLINE — heavier, tighter, more authority ─────────── */
 .hero-h1 {
   font-family: var(--font-display);
-  font-size: clamp(50px, 7vw, 80px);
+  font-size: clamp(52px, 7.5vw, 86px);
   font-weight: 800;
-  letter-spacing: -2.5px;
-  line-height: 1.04;
+  letter-spacing: -3px;
+  line-height: 1.0;
   color: var(--text-primary);
-  margin-bottom: 18px;
+  margin-bottom: 20px;
 }
-.hero-h1 .hl { color: var(--primary); }
+.hero-h1 .hl {
+  color: var(--primary);
+  /* Subtle underline accent */
+  position: relative;
+  display: inline-block;
+}
+.hero-h1 .hl::after {
+  content: '';
+  position: absolute;
+  bottom: 4px; left: 0; right: 0;
+  height: 3px;
+  background: var(--primary);
+  opacity: 0.22;
+  border-radius: 2px;
+}
 
 .hero-sub {
-  font-size: 18px;
-  line-height: 1.75;
+  font-size: 17px;
+  line-height: 1.8;
   color: var(--text-secondary);
-  max-width: 520px;
-  margin: 0 auto 36px;
+  max-width: 480px;
+  margin: 0 auto 40px;
   font-weight: 400;
+  letter-spacing: 0.1px;
 }
 
+/* ── 3-BUTTON CTA ROW ─────────────────────────────────────── */
 .hero-ctas {
   display: flex;
-  gap: 12px;
+  gap: 10px;
   justify-content: center;
   flex-wrap: wrap;
-  margin-bottom: 48px;
+  margin-bottom: 52px;
 }
 
+/* Slightly smaller explore events — clearly tertiary */
+.btn-events {
+  background: transparent;
+  color: var(--text-secondary);
+  border: 1.5px solid var(--border);
+  padding: 12px 22px;
+  border-radius: var(--r-btn);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: border-color var(--t-base), color var(--t-base), background var(--t-base);
+  font-family: var(--font-body);
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  line-height: 1;
+}
+.btn-events:hover {
+  border-color: var(--secondary);
+  color: var(--secondary);
+  background: rgba(38,70,83,0.04);
+}
+
+/* Trust row — same from existing */
 .trust-row {
   display: flex;
-  gap: 16px;
+  gap: 14px;
   justify-content: center;
   flex-wrap: wrap;
   opacity: 0;
-  animation: fadeUp 0.6s ease 1.9s forwards;
+  animation: textReveal 0.8s ease 2.1s forwards;
 }
 .trust-badge {
   display: flex;
@@ -139,49 +208,52 @@
   font-size: 13px;
   color: var(--text-secondary);
   font-weight: 500;
-  box-shadow: var(--shadow-card);
+  box-shadow: 0 1px 8px rgba(43,30,20,0.06);
 }
-.trust-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--primary); flex-shrink: 0; }
+.trust-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--primary); flex-shrink: 0; }
 
+/* Scroll hint */
 .scroll-hint {
   position: absolute;
-  bottom: 32px; left: 50%;
+  bottom: 28px; left: 50%;
   transform: translateX(-50%);
   opacity: 0;
-  animation: fadeUp 0.5s ease 2.2s forwards;
+  animation: textReveal 0.5s ease 2.5s forwards;
   display: flex; flex-direction: column; align-items: center; gap: 6px;
-  color: var(--text-muted); font-size: 11px; font-weight: 600;
-  letter-spacing: 1.5px; text-transform: uppercase; z-index: 2;
+  color: var(--text-muted); font-size: 10px; font-weight: 700;
+  letter-spacing: 2px; text-transform: uppercase; z-index: 2;
 }
-.scroll-dot { width: 4px; height: 4px; border-radius: 50%; background: var(--text-muted); animation: blink 1.4s ease 2.5s infinite; }
-@keyframes blink { 0%,100%{opacity:.3} 50%{opacity:1} }
+.scroll-chevron {
+  width: 20px; height: 20px;
+  border-right: 1.5px solid var(--text-muted);
+  border-bottom: 1.5px solid var(--text-muted);
+  transform: rotate(45deg);
+  animation: scrollBounce 1.8s ease 3s infinite;
+  margin-top: -4px;
+}
+@keyframes scrollBounce {
+  0%,100% { transform: rotate(45deg) translateY(0); opacity: 0.4; }
+  50%      { transform: rotate(45deg) translateY(4px); opacity: 1; }
+}
 
-/* ── EXISTING FEATURES ────────────────────────────────────── */
-.features-section { padding: 80px 0 96px; }
+/* ══════════════════════════════════════════
+   FEATURES — keep existing, small tweaks
+   ══════════════════════════════════════════ */
+.features-section { padding: 88px 0 96px; }
 
 .section-eyebrow {
-  font-size: 11px;
-  font-weight: 800;
-  letter-spacing: 2.5px;
-  text-transform: uppercase;
-  color: var(--primary);
-  margin-bottom: 12px;
+  font-size: 11px; font-weight: 800; letter-spacing: 2.5px;
+  text-transform: uppercase; color: var(--primary); margin-bottom: 12px;
 }
 .section-title {
   font-family: var(--font-display);
   font-size: clamp(30px, 4vw, 46px);
-  font-weight: 800;
-  letter-spacing: -1.5px;
-  line-height: 1.1;
-  color: var(--text-primary);
-  margin-bottom: 12px;
+  font-weight: 800; letter-spacing: -1.5px; line-height: 1.1;
+  color: var(--text-primary); margin-bottom: 12px;
 }
 .section-sub {
-  font-size: 16px;
-  color: var(--text-secondary);
-  line-height: 1.65;
-  max-width: 520px;
-  margin-bottom: 52px;
+  font-size: 16px; color: var(--text-secondary);
+  line-height: 1.65; max-width: 520px; margin-bottom: 52px;
 }
 
 .features-grid {
@@ -189,736 +261,339 @@
   grid-template-columns: repeat(3, 1fr);
   gap: 24px;
 }
-
 .feat-card {
   background: var(--surface);
-  border-radius: var(--r-card);
-  padding: 28px 24px;
+  border-radius: var(--r-card); padding: 28px 24px;
   box-shadow: var(--shadow-card);
   transition: transform var(--t-base), box-shadow var(--t-base);
 }
 .feat-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-warm); }
-
 .feat-icon {
-  width: 48px; height: 48px;
-  border-radius: 14px;
+  width: 48px; height: 48px; border-radius: 14px;
   background: var(--primary-light);
   display: flex; align-items: center; justify-content: center;
-  font-size: 22px;
-  margin-bottom: 18px;
+  font-size: 22px; margin-bottom: 18px;
 }
 .feat-title {
   font-family: var(--font-display);
-  font-size: 17px;
-  font-weight: 700;
-  color: var(--text-primary);
-  margin-bottom: 8px;
-  letter-spacing: -0.3px;
+  font-size: 17px; font-weight: 700;
+  color: var(--text-primary); margin-bottom: 8px; letter-spacing: -0.3px;
 }
-.feat-desc {
-  font-size: 14px;
-  color: var(--text-secondary);
-  line-height: 1.65;
-}
+.feat-desc { font-size: 14px; color: var(--text-secondary); line-height: 1.65; }
 
-/* ══════════════════════════════════════════════════════════
-   NEW SECTIONS
-   ══════════════════════════════════════════════════════════ */
-
-/* ── HOW IT WORKS ──────────────────────────────────────────── */
-.how-section {
-  padding: 96px 0 104px;
-  background: var(--bg);
-}
-
+/* ══════════════════════════════════════════
+   REST — all existing sections preserved
+   ══════════════════════════════════════════ */
+.how-section { padding: 96px 0 104px; background: var(--bg); }
 .steps-row {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 0;
-  position: relative;
-  margin-top: 56px;
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  gap: 0; position: relative; margin-top: 56px;
 }
-
 .steps-row::before {
-  content: '';
-  position: absolute;
-  top: 36px;
-  left: calc(16.6% + 24px);
-  right: calc(16.6% + 24px);
+  content: ''; position: absolute; top: 36px;
+  left: calc(16.6% + 24px); right: calc(16.6% + 24px);
   height: 2px;
   background: linear-gradient(90deg, var(--primary) 0%, rgba(231,111,81,0.15) 50%, var(--primary) 100%);
-  opacity: 0.35;
-  z-index: 0;
+  opacity: 0.3; z-index: 0;
 }
-
-.step-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-  padding: 0 32px;
-  position: relative;
-  z-index: 1;
-}
-
+.step-item { display: flex; flex-direction: column; align-items: center; text-align: center; padding: 0 32px; position: relative; z-index: 1; }
 .step-number-wrap {
-  width: 72px;
-  height: 72px;
-  border-radius: 50%;
-  background: var(--surface);
-  box-shadow: var(--shadow-warm);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: 28px;
-  font-size: 26px;
-  position: relative;
+  width: 72px; height: 72px; border-radius: 50%;
+  background: var(--surface); box-shadow: var(--shadow-warm);
+  display: flex; align-items: center; justify-content: center;
+  margin-bottom: 28px; font-size: 26px; position: relative;
   transition: transform var(--t-base);
 }
 .step-number-wrap:hover { transform: translateY(-3px); }
-
 .step-num {
-  position: absolute;
-  top: -6px;
-  right: -6px;
-  width: 22px;
-  height: 22px;
-  border-radius: 50%;
-  background: var(--primary);
-  color: #fff;
-  font-size: 11px;
-  font-weight: 800;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  position: absolute; top: -6px; right: -6px;
+  width: 22px; height: 22px; border-radius: 50%;
+  background: var(--primary); color: #fff;
+  font-size: 11px; font-weight: 800;
+  display: flex; align-items: center; justify-content: center;
   font-family: var(--font-display);
 }
+.step-title { font-family: var(--font-display); font-size: 18px; font-weight: 700; color: var(--text-primary); margin-bottom: 10px; letter-spacing: -0.3px; }
+.step-desc { font-size: 14px; color: var(--text-secondary); line-height: 1.7; max-width: 220px; }
 
-.step-title {
-  font-family: var(--font-display);
-  font-size: 18px;
-  font-weight: 700;
-  color: var(--text-primary);
-  margin-bottom: 10px;
-  letter-spacing: -0.3px;
-}
+.discovery-section { padding: 96px 0 104px; background: var(--surface); }
+.discovery-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 28px; margin-top: 56px; }
+.disc-card { background: var(--bg); border-radius: var(--r-card); overflow: hidden; box-shadow: var(--shadow-card); transition: transform var(--t-base), box-shadow var(--t-base); cursor: pointer; }
+.disc-card:hover { transform: translateY(-5px); box-shadow: var(--shadow-warm); }
+.disc-card-img { width: 100%; height: 180px; background: linear-gradient(135deg, var(--primary-light) 0%, rgba(38,70,83,0.08) 100%); display: flex; align-items: center; justify-content: center; font-size: 52px; }
+.disc-card-body { padding: 24px 22px 26px; }
+.disc-icon-badge { width: 38px; height: 38px; border-radius: 10px; background: var(--primary-light); display: flex; align-items: center; justify-content: center; font-size: 18px; margin-bottom: 14px; }
+.disc-card-title { font-family: var(--font-display); font-size: 17px; font-weight: 700; color: var(--text-primary); margin-bottom: 8px; letter-spacing: -0.3px; }
+.disc-card-desc { font-size: 14px; color: var(--text-secondary); line-height: 1.65; }
 
-.step-desc {
-  font-size: 14px;
-  color: var(--text-secondary);
-  line-height: 1.7;
-  max-width: 220px;
-}
+.why-section { padding: 96px 0 104px; background: #EDE6D9; }
+.why-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 36px; margin-top: 56px; }
+.why-item { display: flex; flex-direction: column; gap: 14px; }
+.why-icon { width: 52px; height: 52px; border-radius: 16px; background: var(--surface); box-shadow: var(--shadow-card); display: flex; align-items: center; justify-content: center; font-size: 24px; }
+.why-title { font-family: var(--font-display); font-size: 18px; font-weight: 700; color: var(--text-primary); letter-spacing: -0.3px; }
+.why-desc { font-size: 14px; color: var(--text-secondary); line-height: 1.7; }
 
-/* ── DISCOVERY / FEATURES ──────────────────────────────────── */
-.discovery-section {
-  padding: 96px 0 104px;
-  background: var(--surface);
-}
-
-.discovery-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 28px;
-  margin-top: 56px;
-}
-
-.disc-card {
-  background: var(--bg);
-  border-radius: var(--r-card);
-  overflow: hidden;
-  box-shadow: var(--shadow-card);
-  transition: transform var(--t-base), box-shadow var(--t-base);
-  cursor: pointer;
-}
-.disc-card:hover {
-  transform: translateY(-5px);
-  box-shadow: var(--shadow-warm);
-}
-
-.disc-card-img {
-  width: 100%;
-  height: 180px;
-  background: linear-gradient(135deg, var(--primary-light) 0%, rgba(38,70,83,0.08) 100%);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 52px;
-}
-
-.disc-card-body {
-  padding: 24px 22px 26px;
-}
-
-.disc-icon-badge {
-  width: 38px;
-  height: 38px;
-  border-radius: 10px;
-  background: var(--primary-light);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 18px;
-  margin-bottom: 14px;
-}
-
-.disc-card-title {
-  font-family: var(--font-display);
-  font-size: 17px;
-  font-weight: 700;
-  color: var(--text-primary);
-  margin-bottom: 8px;
-  letter-spacing: -0.3px;
-}
-
-.disc-card-desc {
-  font-size: 14px;
-  color: var(--text-secondary);
-  line-height: 1.65;
-}
-
-/* ── WHY CHOOSE ───────────────────────────────────────────── */
-.why-section {
-  padding: 96px 0 104px;
-  background: #EDE6D9;
-}
-
-.why-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 36px;
-  margin-top: 56px;
-}
-
-.why-item {
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-}
-
-.why-icon {
-  width: 52px;
-  height: 52px;
-  border-radius: 16px;
-  background: var(--surface);
-  box-shadow: var(--shadow-card);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 24px;
-}
-
-.why-title {
-  font-family: var(--font-display);
-  font-size: 18px;
-  font-weight: 700;
-  color: var(--text-primary);
-  letter-spacing: -0.3px;
-}
-
-.why-desc {
-  font-size: 14px;
-  color: var(--text-secondary);
-  line-height: 1.7;
-}
-
-/* ── STATS ────────────────────────────────────────────────── */
-.stats-section {
-  padding: 88px 0 96px;
-  background: var(--secondary);
-  position: relative;
-  overflow: hidden;
-}
-
-.stats-section::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: radial-gradient(ellipse 70% 80% at 50% 50%, rgba(231,111,81,0.1) 0%, transparent 70%);
-  pointer-events: none;
-}
-
-.stats-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  position: relative;
-  z-index: 1;
-  text-align: center;
-}
-
-.stat-divider {
-  border-left: 1px solid rgba(244,237,228,0.12);
-  padding: 0 24px;
-}
+.stats-section { padding: 88px 0 96px; background: var(--secondary); position: relative; overflow: hidden; }
+.stats-section::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse 70% 80% at 50% 50%, rgba(231,111,81,0.1) 0%, transparent 70%); pointer-events: none; }
+.stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); position: relative; z-index: 1; text-align: center; }
+.stat-divider { border-left: 1px solid rgba(244,237,228,0.12); padding: 0 24px; }
 .stat-divider:first-child { border-left: none; }
-
-.stat-num {
-  font-family: var(--font-display);
-  font-size: clamp(36px, 5vw, 58px);
-  font-weight: 800;
-  color: #FAF9F6;
-  letter-spacing: -2px;
-  line-height: 1;
-  margin-bottom: 10px;
-}
+.stat-num { font-family: var(--font-display); font-size: clamp(36px, 5vw, 58px); font-weight: 800; color: #FAF9F6; letter-spacing: -2px; line-height: 1; margin-bottom: 10px; }
 .stat-num .stat-accent { color: var(--primary); }
+.stat-label { font-size: 14px; color: rgba(244,237,228,0.65); font-weight: 500; letter-spacing: 0.3px; }
 
-.stat-label {
-  font-size: 14px;
-  color: rgba(244,237,228,0.65);
-  font-weight: 500;
-  letter-spacing: 0.3px;
-}
-
-/* ── TESTIMONIALS ─────────────────────────────────────────── */
-.testimonials-section {
-  padding: 96px 0 104px;
-  background: var(--bg);
-}
-
-.testimonials-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 24px;
-  margin-top: 56px;
-}
-
-.testi-card {
-  background: var(--surface);
-  border-radius: var(--r-card);
-  padding: 32px 28px;
-  box-shadow: var(--shadow-card);
-  transition: transform var(--t-base), box-shadow var(--t-base);
-  display: flex;
-  flex-direction: column;
-  gap: 18px;
-}
-.testi-card:hover {
-  transform: translateY(-4px);
-  box-shadow: var(--shadow-warm);
-}
-
-.testi-stars {
-  display: flex;
-  gap: 4px;
-  color: var(--accent);
-  font-size: 16px;
-}
-
-.testi-quote {
-  font-size: 15px;
-  color: var(--text-primary);
-  line-height: 1.75;
-  font-style: italic;
-  flex: 1;
-}
+.testimonials-section { padding: 96px 0 104px; background: var(--bg); }
+.testimonials-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; margin-top: 56px; }
+.testi-card { background: var(--surface); border-radius: var(--r-card); padding: 32px 28px; box-shadow: var(--shadow-card); transition: transform var(--t-base), box-shadow var(--t-base); display: flex; flex-direction: column; gap: 18px; }
+.testi-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-warm); }
+.testi-stars { display: flex; gap: 4px; color: var(--accent); font-size: 16px; }
+.testi-quote { font-size: 15px; color: var(--text-primary); line-height: 1.75; font-style: italic; flex: 1; }
 .testi-quote::before { content: '\201C'; }
 .testi-quote::after  { content: '\201D'; }
+.testi-user { display: flex; align-items: center; gap: 12px; padding-top: 4px; }
+.testi-avatar { width: 42px; height: 42px; border-radius: 50%; background: var(--primary-light); display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
+.testi-name { font-family: var(--font-display); font-size: 14px; font-weight: 700; color: var(--text-primary); margin-bottom: 2px; }
+.testi-location { font-size: 12px; color: var(--text-muted); }
 
-.testi-user {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding-top: 4px;
-}
+.cta-section { padding: 96px 0 104px; background: var(--secondary); position: relative; overflow: hidden; text-align: center; }
+.cta-section::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse 60% 70% at 30% 40%, rgba(231,111,81,0.12) 0%, transparent 65%), radial-gradient(ellipse 50% 60% at 70% 65%, rgba(233,196,106,0.06) 0%, transparent 55%); pointer-events: none; }
+.cta-inner { position: relative; z-index: 1; max-width: 640px; margin: 0 auto; }
+.cta-eyebrow { font-size: 11px; font-weight: 800; letter-spacing: 2.5px; text-transform: uppercase; color: var(--primary); margin-bottom: 16px; }
+.cta-heading { font-family: var(--font-display); font-size: clamp(32px, 4.5vw, 52px); font-weight: 800; letter-spacing: -1.8px; line-height: 1.08; color: #FAF9F6; margin-bottom: 18px; }
+.cta-sub { font-size: 16px; color: rgba(244,237,228,0.65); line-height: 1.7; margin-bottom: 40px; max-width: 480px; margin-left: auto; margin-right: auto; }
+.cta-btn-wrap { margin-bottom: 52px; }
+.cta-highlights { display: flex; gap: 32px; justify-content: center; flex-wrap: wrap; }
+.cta-highlight { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.cta-highlight-icon { font-size: 20px; margin-bottom: 4px; }
+.cta-highlight-label { font-family: var(--font-display); font-size: 14px; font-weight: 700; color: #FAF9F6; }
+.cta-highlight-sub { font-size: 12px; color: rgba(244,237,228,0.5); }
 
-.testi-avatar {
-  width: 42px;
-  height: 42px;
-  border-radius: 50%;
-  background: var(--primary-light);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 18px;
-  flex-shrink: 0;
-}
-
-.testi-name {
-  font-family: var(--font-display);
-  font-size: 14px;
-  font-weight: 700;
-  color: var(--text-primary);
-  margin-bottom: 2px;
-}
-
-.testi-location {
-  font-size: 12px;
-  color: var(--text-muted);
-}
-
-/* ── FINAL CTA ────────────────────────────────────────────── */
-.cta-section {
-  padding: 96px 0 104px;
-  background: var(--secondary);
-  position: relative;
-  overflow: hidden;
-  text-align: center;
-}
-
-.cta-section::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background:
-    radial-gradient(ellipse 60% 70% at 30% 40%, rgba(231,111,81,0.12) 0%, transparent 65%),
-    radial-gradient(ellipse 50% 60% at 70% 65%, rgba(233,196,106,0.06) 0%, transparent 55%);
-  pointer-events: none;
-}
-
-.cta-inner {
-  position: relative;
-  z-index: 1;
-  max-width: 640px;
-  margin: 0 auto;
-}
-
-.cta-eyebrow {
-  font-size: 11px;
-  font-weight: 800;
-  letter-spacing: 2.5px;
-  text-transform: uppercase;
-  color: var(--primary);
-  margin-bottom: 16px;
-}
-
-.cta-heading {
-  font-family: var(--font-display);
-  font-size: clamp(32px, 4.5vw, 52px);
-  font-weight: 800;
-  letter-spacing: -1.8px;
-  line-height: 1.08;
-  color: #FAF9F6;
-  margin-bottom: 18px;
-}
-
-.cta-sub {
-  font-size: 16px;
-  color: rgba(244,237,228,0.65);
-  line-height: 1.7;
-  margin-bottom: 40px;
-  max-width: 480px;
-  margin-left: auto;
-  margin-right: auto;
-}
-
-.cta-btn-wrap {
-  margin-bottom: 52px;
-}
-
-.cta-highlights {
-  display: flex;
-  gap: 32px;
-  justify-content: center;
-  flex-wrap: wrap;
-}
-
-.cta-highlight {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 4px;
-}
-
-.cta-highlight-icon {
-  font-size: 20px;
-  margin-bottom: 4px;
-}
-
-.cta-highlight-label {
-  font-family: var(--font-display);
-  font-size: 14px;
-  font-weight: 700;
-  color: #FAF9F6;
-}
-
-.cta-highlight-sub {
-  font-size: 12px;
-  color: rgba(244,237,228,0.5);
-}
-
-/* ── FOOTER ───────────────────────────────────────────────── */
-.site-footer {
-  background: #1a2d36;
-  padding: 60px 0 32px;
-  color: rgba(244,237,228,0.75);
-}
-
-.footer-grid {
-  display: grid;
-  grid-template-columns: 1.6fr 1fr 1fr;
-  gap: 48px;
-  padding-bottom: 48px;
-}
-
-.footer-brand {
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-}
-
-.footer-logo {
-  font-family: var(--font-display);
-  font-size: 22px;
-  font-weight: 800;
-  color: #FAF9F6;
-  letter-spacing: -0.5px;
-}
+.site-footer { background: #1a2d36; padding: 60px 0 32px; color: rgba(244,237,228,0.75); }
+.footer-grid { display: grid; grid-template-columns: 1.6fr 1fr 1fr; gap: 48px; padding-bottom: 48px; }
+.footer-brand { display: flex; flex-direction: column; gap: 14px; }
+.footer-logo { font-family: var(--font-display); font-size: 22px; font-weight: 800; color: #FAF9F6; letter-spacing: -0.5px; }
 .footer-logo span { color: var(--primary); }
-
-.footer-desc {
-  font-size: 14px;
-  line-height: 1.7;
-  color: rgba(244,237,228,0.55);
-  max-width: 280px;
-}
-
-.footer-email {
-  font-size: 13px;
-  color: var(--primary);
-  text-decoration: none;
-  transition: opacity var(--t-base);
-}
+.footer-desc { font-size: 14px; line-height: 1.7; color: rgba(244,237,228,0.55); max-width: 280px; }
+.footer-email { font-size: 13px; color: var(--primary); text-decoration: none; transition: opacity var(--t-base); }
 .footer-email:hover { opacity: 0.75; }
-
-.footer-col-title {
-  font-family: var(--font-display);
-  font-size: 11px;
-  font-weight: 700;
-  color: #FAF9F6;
-  letter-spacing: 2px;
-  margin-bottom: 18px;
-  text-transform: uppercase;
-}
-
-.footer-links {
-  list-style: none;
-  display: flex;
-  flex-direction: column;
-  gap: 11px;
-}
-
-.footer-links a {
-  font-size: 14px;
-  color: rgba(244,237,228,0.6);
-  text-decoration: none;
-  transition: color var(--t-base);
-}
+.footer-col-title { font-family: var(--font-display); font-size: 11px; font-weight: 700; color: #FAF9F6; letter-spacing: 2px; margin-bottom: 18px; text-transform: uppercase; }
+.footer-links { list-style: none; display: flex; flex-direction: column; gap: 11px; }
+.footer-links a { font-size: 14px; color: rgba(244,237,228,0.6); text-decoration: none; transition: color var(--t-base); }
 .footer-links a:hover { color: #FAF9F6; }
-
-.footer-bottom {
-  border-top: 1px solid rgba(244,237,228,0.08);
-  padding-top: 28px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 12px;
-}
-
-.footer-copy {
-  font-size: 13px;
-  color: rgba(244,237,228,0.35);
-}
-
-.footer-legal {
-  display: flex;
-  gap: 24px;
-}
-
-.footer-legal a {
-  font-size: 13px;
-  color: rgba(244,237,228,0.35);
-  text-decoration: none;
-  transition: color var(--t-base);
-}
+.footer-bottom { border-top: 1px solid rgba(244,237,228,0.08); padding-top: 28px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; }
+.footer-copy { font-size: 13px; color: rgba(244,237,228,0.35); }
+.footer-legal { display: flex; gap: 24px; }
+.footer-legal a { font-size: 13px; color: rgba(244,237,228,0.35); text-decoration: none; transition: color var(--t-base); }
 .footer-legal a:hover { color: rgba(244,237,228,0.65); }
 
-/* ── SCROLL FADE-IN ───────────────────────────────────────── */
-.fade-in-up {
-  opacity: 0;
-  transform: translateY(28px);
-  transition: opacity 0.55s ease, transform 0.55s ease;
-}
-.fade-in-up.visible {
-  opacity: 1;
-  transform: translateY(0);
-}
+.fade-in-up { opacity: 0; transform: translateY(28px); transition: opacity 0.6s ease, transform 0.6s ease; }
+.fade-in-up.visible { opacity: 1; transform: translateY(0); }
 
-/* ── RESPONSIVE ───────────────────────────────────────────── */
 @media (max-width: 768px) {
-  .stage { width: 320px; height: 160px; }
-  .char-solo svg { width: 80px; }
-  .char-group svg { width: 150px; }
-  .hero { padding: 80px 24px 48px; }
-  .features-grid { grid-template-columns: 1fr; }
-  .trust-row { gap: 10px; }
-}
-
-@media (max-width: 900px) {
-  .steps-row,
-  .discovery-grid,
-  .why-grid,
-  .testimonials-grid {
-    grid-template-columns: 1fr;
-    gap: 32px;
-  }
-  .stats-grid {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 48px 0;
-  }
+  .stage { width: 340px; height: 180px; }
+  .hero { padding: 80px 24px 56px; }
+  .hero-h1 { letter-spacing: -2px; }
+  .hero-ctas { gap: 8px; }
+  .features-grid, .steps-row, .discovery-grid, .why-grid, .testimonials-grid { grid-template-columns: 1fr; }
+  .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 40px 0; }
   .stat-divider:nth-child(odd) { border-left: none; }
   .steps-row::before { display: none; }
-  .step-item { padding: 0 16px; }
-  .footer-grid {
-    grid-template-columns: 1fr;
-    gap: 36px;
-  }
-  .footer-bottom {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-  .cta-highlights { gap: 24px; }
-}
-
-@media (max-width: 600px) {
-  .stats-grid { grid-template-columns: 1fr 1fr; }
-  .cta-highlights { flex-direction: column; align-items: center; gap: 20px; }
+  .footer-grid { grid-template-columns: 1fr; gap: 36px; }
 }
 </style>
 {% endblock %}
 
 {% block content %}
-<!-- ═══════════════════ HERO (unchanged) ═══════════════════ -->
+
+<!-- ════════════════════════════════════════
+     HERO
+     ════════════════════════════════════════ -->
 <section class="hero">
   <div class="hero-bg"></div>
+  <div class="hero-ground"></div>
 
   <div class="hero-inner">
+
+    <!-- ── ABSTRACT MINIMAL ILLUSTRATION STAGE ── -->
     <div class="stage" aria-hidden="true">
+
+      <!-- Ground shadow — anchors the scene -->
+      <div class="stage-ground"></div>
+
+      <!-- LEFT FIGURE — solo person waving
+           Abstract, minimal, slightly muted tones — not cartoonish -->
       <div class="char-solo">
-        <svg width="115" height="210" viewBox="0 0 115 210" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <ellipse cx="57" cy="52" rx="24" ry="24" fill="#FDBA9A"/>
-          <ellipse cx="57" cy="35" rx="24" ry="15" fill="#2B1810"/>
-          <ellipse cx="34" cy="42" rx="7" ry="13" fill="#2B1810"/>
-          <rect x="50" y="73" width="14" height="12" rx="4" fill="#FDBA9A"/>
-          <path d="M26 98 Q57 84 88 98 L91 162 Q57 174 23 162 Z" fill="#E76F51"/>
-          <path d="M46 85 L57 98 L68 85" stroke="#C85A3B" stroke-width="2" fill="none"/>
-          <path d="M88 105 Q100 128 96 152" stroke="#FDBA9A" stroke-width="15" stroke-linecap="round"/>
-          <circle cx="96" cy="154" r="8" fill="#FDBA9A"/>
+        <svg width="96" height="200" viewBox="0 0 96 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <!-- Head — clean circle, muted skin -->
+          <circle cx="48" cy="40" r="22" fill="#D4956A"/>
+
+          <!-- Hair — flat top shape -->
+          <ellipse cx="48" cy="24" rx="22" ry="12" fill="#3D2414"/>
+          <rect x="26" y="18" width="8" height="20" rx="4" fill="#3D2414"/>
+
+          <!-- Neck -->
+          <rect x="43" y="60" width="10" height="10" rx="3" fill="#D4956A"/>
+
+          <!-- Torso — terracotta shirt, clean silhouette -->
+          <path d="M22 82 Q48 68 74 82 L76 148 Q48 160 20 148 Z" fill="#C96B4E"/>
+          <!-- Subtle shirt fold -->
+          <line x1="48" y1="70" x2="48" y2="148" stroke="#B85C40" stroke-width="1" opacity="0.4"/>
+
+          <!-- Right arm (our left) — hangs naturally -->
+          <path d="M74 90 Q84 114 80 140" stroke="#D4956A" stroke-width="12" stroke-linecap="round"/>
+          <circle cx="80" cy="142" r="7" fill="#D4956A"/>
+
+          <!-- Left arm (our right) — raised in wave
+               Group rotates around the shoulder point -->
           <g class="wave-arm">
-            <path d="M26 105 Q10 82 12 60" stroke="#FDBA9A" stroke-width="15" stroke-linecap="round"/>
-            <path d="M12 60 Q8 44 14 34" stroke="#FDBA9A" stroke-width="13" stroke-linecap="round"/>
-            <ellipse cx="16" cy="30" rx="10" ry="12" fill="#FDBA9A"/>
-            <line x1="9"  y1="22" x2="6"  y2="13" stroke="#FDBA9A" stroke-width="4" stroke-linecap="round"/>
-            <line x1="13" y1="19" x2="11" y2="9"  stroke="#FDBA9A" stroke-width="4" stroke-linecap="round"/>
-            <line x1="17" y1="18" x2="17" y2="8"  stroke="#FDBA9A" stroke-width="4" stroke-linecap="round"/>
-            <line x1="21" y1="19" x2="24" y2="10" stroke="#FDBA9A" stroke-width="4" stroke-linecap="round"/>
-            <line x1="24" y1="22" x2="28" y2="16" stroke="#FDBA9A" stroke-width="4" stroke-linecap="round"/>
+            <path d="M22 90 Q8 68 10 46" stroke="#D4956A" stroke-width="12" stroke-linecap="round"/>
+            <!-- Forearm slightly angled -->
+            <path d="M10 46 Q6 30 12 20" stroke="#D4956A" stroke-width="11" stroke-linecap="round"/>
+            <!-- Open hand — minimal, 3 rounded shapes -->
+            <ellipse cx="13" cy="16" rx="9" ry="10" fill="#D4956A"/>
+            <!-- 3 clean finger stubs — not cartoon fingers -->
+            <rect x="6"  y="7"  width="5" height="8" rx="2.5" fill="#D4956A"/>
+            <rect x="12" y="5"  width="5" height="9" rx="2.5" fill="#D4956A"/>
+            <rect x="18" y="7"  width="5" height="8" rx="2.5" fill="#D4956A"/>
           </g>
-          <path d="M35 162 Q28 186 33 205" stroke="#264653" stroke-width="19" stroke-linecap="round"/>
-          <path d="M79 162 Q86 186 81 205" stroke="#264653" stroke-width="19" stroke-linecap="round"/>
-          <ellipse cx="32" cy="206" rx="13" ry="6" fill="#1a2e38"/>
-          <ellipse cx="82" cy="206" rx="13" ry="6" fill="#1a2e38"/>
-          <ellipse cx="49" cy="57" rx="3.5" ry="4" fill="#2B1810"/>
-          <ellipse cx="65" cy="57" rx="3.5" ry="4" fill="#2B1810"/>
-          <circle cx="50.5" cy="55.5" r="1.2" fill="#fff"/>
-          <circle cx="66.5" cy="55.5" r="1.2" fill="#fff"/>
-          <path d="M48 69 Q57 76 66 69" stroke="#2B1810" stroke-width="2.5" stroke-linecap="round" fill="none"/>
-          <ellipse cx="43" cy="65" rx="5" ry="3.5" fill="rgba(231,111,81,0.22)"/>
-          <ellipse cx="71" cy="65" rx="5" ry="3.5" fill="rgba(231,111,81,0.22)"/>
+
+          <!-- Trousers — deep teal -->
+          <path d="M30 148 Q22 174 26 192" stroke="#264653" stroke-width="17" stroke-linecap="round"/>
+          <path d="M66 148 Q74 174 70 192" stroke="#264653" stroke-width="17" stroke-linecap="round"/>
+          <!-- Shoes — grounded ellipses -->
+          <ellipse cx="25" cy="193" rx="12" ry="5" fill="#1a2e38"/>
+          <ellipse cx="71" cy="193" rx="12" ry="5" fill="#1a2e38"/>
+
+          <!-- Face — minimal, composed expression -->
+          <ellipse cx="41" cy="44" rx="3" ry="3.5" fill="#3D2414"/>
+          <ellipse cx="55" cy="44" rx="3" ry="3.5" fill="#3D2414"/>
+          <!-- Soft smile -->
+          <path d="M41 55 Q48 61 55 55" stroke="#3D2414" stroke-width="2" stroke-linecap="round" fill="none"/>
         </svg>
       </div>
 
+      <!-- RIGHT GROUP — 3 people, composed, minimal
+           Slightly offset heights for natural grouping -->
       <div class="char-group">
-        <svg width="235" height="210" viewBox="0 0 235 210" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <ellipse cx="58" cy="48" rx="20" ry="20" fill="#C68642"/>
-          <ellipse cx="58" cy="32" rx="20" ry="13" fill="#1a0e06"/>
-          <rect x="51" y="65" width="14" height="10" rx="4" fill="#C68642"/>
-          <path d="M30 88 Q58 74 86 88 L89 146 Q58 158 27 146 Z" fill="#264653"/>
-          <path d="M30 94 Q18 116 21 138" stroke="#C68642" stroke-width="13" stroke-linecap="round"/>
-          <circle cx="21" cy="140" r="7" fill="#C68642"/>
-          <path d="M86 94 Q98 116 95 138" stroke="#C68642" stroke-width="13" stroke-linecap="round"/>
-          <circle cx="95" cy="140" r="7" fill="#C68642"/>
-          <path d="M38 146 Q32 170 36 186" stroke="#1a3340" stroke-width="16" stroke-linecap="round"/>
-          <path d="M78 146 Q84 170 80 186" stroke="#1a3340" stroke-width="16" stroke-linecap="round"/>
-          <ellipse cx="35" cy="187" rx="11" ry="5" fill="#0d1f27"/>
-          <ellipse cx="81" cy="187" rx="11" ry="5" fill="#0d1f27"/>
-          <ellipse cx="51" cy="53" rx="3" ry="3.5" fill="#1a0e06"/>
-          <ellipse cx="65" cy="53" rx="3" ry="3.5" fill="#1a0e06"/>
-          <circle cx="52" cy="51.8" r="1" fill="#fff"/>
-          <circle cx="66" cy="51.8" r="1" fill="#fff"/>
-          <path d="M51 62 Q58 67 65 62" stroke="#1a0e06" stroke-width="2" stroke-linecap="round" fill="none"/>
-          <ellipse cx="178" cy="48" rx="20" ry="20" fill="#FDBA9A"/>
-          <ellipse cx="178" cy="32" rx="20" ry="13" fill="#7a3e10"/>
-          <rect x="171" y="65" width="14" height="10" rx="4" fill="#FDBA9A"/>
-          <path d="M150 88 Q178 74 206 88 L209 146 Q178 158 147 146 Z" fill="#E9C46A"/>
-          <path d="M150 94 Q138 116 141 138" stroke="#FDBA9A" stroke-width="13" stroke-linecap="round"/>
-          <circle cx="141" cy="140" r="7" fill="#FDBA9A"/>
-          <path d="M206 94 Q218 116 215 138" stroke="#FDBA9A" stroke-width="13" stroke-linecap="round"/>
-          <circle cx="215" cy="140" r="7" fill="#FDBA9A"/>
-          <path d="M158 146 Q152 170 156 186" stroke="#5c4700" stroke-width="16" stroke-linecap="round"/>
-          <path d="M198 146 Q204 170 200 186" stroke="#5c4700" stroke-width="16" stroke-linecap="round"/>
-          <ellipse cx="155" cy="187" rx="11" ry="5" fill="#3d2f00"/>
-          <ellipse cx="201" cy="187" rx="11" ry="5" fill="#3d2f00"/>
-          <ellipse cx="171" cy="53" rx="3" ry="3.5" fill="#7a3e10"/>
-          <ellipse cx="185" cy="53" rx="3" ry="3.5" fill="#7a3e10"/>
-          <circle cx="172" cy="51.8" r="1" fill="#fff"/>
-          <circle cx="186" cy="51.8" r="1" fill="#fff"/>
-          <path d="M171 62 Q178 67 185 62" stroke="#7a3e10" stroke-width="2" stroke-linecap="round" fill="none"/>
-          <ellipse cx="118" cy="40" rx="22" ry="22" fill="#F4A87C"/>
-          <ellipse cx="118" cy="23" rx="22" ry="14" fill="#3D1A00"/>
-          <ellipse cx="96"  cy="30" rx="8"  ry="10" fill="#3D1A00"/>
-          <ellipse cx="140" cy="30" rx="8"  ry="10" fill="#3D1A00"/>
-          <rect x="110" y="59" width="16" height="11" rx="5" fill="#F4A87C"/>
-          <path d="M87 82 Q118 67 149 82 L153 148 Q118 162 83 148 Z" fill="#E76F51"/>
-          <path d="M106 70 L118 84 L130 70" stroke="#C85A3B" stroke-width="2" fill="none"/>
-          <path d="M149 89 Q163 114 159 140" stroke="#F4A87C" stroke-width="14" stroke-linecap="round"/>
-          <circle cx="158" cy="142" r="8" fill="#F4A87C"/>
-          <path d="M87 89 Q73 114 77 140" stroke="#F4A87C" stroke-width="14" stroke-linecap="round"/>
-          <circle cx="78" cy="142" r="8" fill="#F4A87C"/>
-          <path d="M96 148 Q88 174 93 192" stroke="#264653" stroke-width="18" stroke-linecap="round"/>
-          <path d="M140 148 Q148 174 143 192" stroke="#264653" stroke-width="18" stroke-linecap="round"/>
-          <ellipse cx="92"  cy="193" rx="13" ry="6" fill="#1a2e38"/>
-          <ellipse cx="144" cy="193" rx="13" ry="6" fill="#1a2e38"/>
-          <ellipse cx="110" cy="46" rx="3.5" ry="4" fill="#3D1A00"/>
-          <ellipse cx="126" cy="46" rx="3.5" ry="4" fill="#3D1A00"/>
-          <circle cx="111.5" cy="44.5" r="1.2" fill="#fff"/>
-          <circle cx="127.5" cy="44.5" r="1.2" fill="#fff"/>
-          <path d="M109 57 Q118 64 127 57" stroke="#3D1A00" stroke-width="2.5" stroke-linecap="round" fill="none"/>
-          <ellipse cx="103" cy="52" rx="6" ry="4" fill="rgba(231,111,81,0.22)"/>
-          <ellipse cx="133" cy="52" rx="6" ry="4" fill="rgba(231,111,81,0.22)"/>
+        <svg width="230" height="200" viewBox="0 0 230 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+
+          <!-- ── PERSON A — left, slightly shorter ── -->
+          <!-- Head -->
+          <circle cx="52" cy="52" r="19" fill="#B07040"/>
+          <!-- Hair -->
+          <ellipse cx="52" cy="38" rx="19" ry="11" fill="#1E0F04"/>
+          <!-- Neck -->
+          <rect x="46" y="69" width="12" height="9" rx="3" fill="#B07040"/>
+          <!-- Torso — teal -->
+          <path d="M27 84 Q52 72 77 84 L79 142 Q52 152 25 142 Z" fill="#264653"/>
+          <!-- Arms — both natural hang -->
+          <path d="M27 90 Q16 112 19 134" stroke="#B07040" stroke-width="11" stroke-linecap="round"/>
+          <circle cx="19" cy="136" r="6" fill="#B07040"/>
+          <path d="M77 90 Q88 112 85 134" stroke="#B07040" stroke-width="11" stroke-linecap="round"/>
+          <circle cx="85" cy="136" r="6" fill="#B07040"/>
+          <!-- Legs -->
+          <path d="M34 142 Q27 166 31 182" stroke="#1a2e38" stroke-width="14" stroke-linecap="round"/>
+          <path d="M70 142 Q77 166 73 182" stroke="#1a2e38" stroke-width="14" stroke-linecap="round"/>
+          <ellipse cx="30" cy="183" rx="10" ry="5" fill="#111d23"/>
+          <ellipse cx="74" cy="183" rx="10" ry="5" fill="#111d23"/>
+          <!-- Face A -->
+          <ellipse cx="46" cy="56" rx="2.5" ry="3" fill="#1E0F04"/>
+          <ellipse cx="58" cy="56" rx="2.5" ry="3" fill="#1E0F04"/>
+          <path d="M46 65 Q52 70 58 65" stroke="#1E0F04" stroke-width="1.8" stroke-linecap="round" fill="none"/>
+
+          <!-- ── PERSON C — front-center, tallest, anchors the group ── -->
+          <circle cx="115" cy="42" r="21" fill="#E09060"/>
+          <!-- Hair — curly/full -->
+          <ellipse cx="115" cy="27" rx="21" ry="13" fill="#2C1200"/>
+          <ellipse cx="94"  cy="34" rx="7"  ry="9"  fill="#2C1200"/>
+          <ellipse cx="136" cy="34" rx="7"  ry="9"  fill="#2C1200"/>
+          <!-- Neck -->
+          <rect x="109" y="61" width="12" height="10" rx="3" fill="#E09060"/>
+          <!-- Torso — terracotta -->
+          <path d="M88 78 Q115 64 142 78 L145 148 Q115 160 85 148 Z" fill="#C96B4E"/>
+          <!-- Arms hang -->
+          <path d="M88 85 Q75 108 79 134" stroke="#E09060" stroke-width="12" stroke-linecap="round"/>
+          <circle cx="79" cy="136" r="7" fill="#E09060"/>
+          <path d="M142 85 Q155 108 151 134" stroke="#E09060" stroke-width="12" stroke-linecap="round"/>
+          <circle cx="151" cy="136" r="7" fill="#E09060"/>
+          <!-- Legs -->
+          <path d="M94 148 Q86 174 90 192" stroke="#264653" stroke-width="16" stroke-linecap="round"/>
+          <path d="M136 148 Q144 174 140 192" stroke="#264653" stroke-width="16" stroke-linecap="round"/>
+          <ellipse cx="89"  cy="193" rx="12" ry="5" fill="#1a2e38"/>
+          <ellipse cx="141" cy="193" rx="12" ry="5" fill="#1a2e38"/>
+          <!-- Face C — warm, composed -->
+          <ellipse cx="108" cy="47" rx="3" ry="3.5" fill="#2C1200"/>
+          <ellipse cx="122" cy="47" rx="3" ry="3.5" fill="#2C1200"/>
+          <path d="M107 58 Q115 64 123 58" stroke="#2C1200" stroke-width="2.2" stroke-linecap="round" fill="none"/>
+
+          <!-- ── PERSON B — right, slightly different height ── -->
+          <circle cx="178" cy="50" r="19" fill="#F2B89A"/>
+          <!-- Hair — lighter, swept -->
+          <ellipse cx="178" cy="36" rx="19" ry="11" fill="#7B3A10"/>
+          <ellipse cx="197" cy="41" rx="5" ry="9" fill="#7B3A10"/>
+          <!-- Neck -->
+          <rect x="172" y="67" width="12" height="9" rx="3" fill="#F2B89A"/>
+          <!-- Torso — accent/mustard -->
+          <path d="M153 82 Q178 70 203 82 L205 140 Q178 150 151 140 Z" fill="#C9A130"/>
+          <!-- Arms hang -->
+          <path d="M153 88 Q142 110 145 132" stroke="#F2B89A" stroke-width="11" stroke-linecap="round"/>
+          <circle cx="145" cy="134" r="6" fill="#F2B89A"/>
+          <path d="M203 88 Q214 110 211 132" stroke="#F2B89A" stroke-width="11" stroke-linecap="round"/>
+          <circle cx="211" cy="134" r="6" fill="#F2B89A"/>
+          <!-- Legs -->
+          <path d="M160 140 Q153 164 157 180" stroke="#4a3200" stroke-width="14" stroke-linecap="round"/>
+          <path d="M196 140 Q203 164 199 180" stroke="#4a3200" stroke-width="14" stroke-linecap="round"/>
+          <ellipse cx="156" cy="181" rx="10" ry="5" fill="#2e1f00"/>
+          <ellipse cx="200" cy="181" rx="10" ry="5" fill="#2e1f00"/>
+          <!-- Face B -->
+          <ellipse cx="172" cy="54" rx="2.5" ry="3" fill="#7B3A10"/>
+          <ellipse cx="184" cy="54" rx="2.5" ry="3" fill="#7B3A10"/>
+          <path d="M172 63 Q178 68 184 63" stroke="#7B3A10" stroke-width="1.8" stroke-linecap="round" fill="none"/>
+
         </svg>
       </div>
-    </div>
+    </div><!-- /stage -->
 
+    <!-- ── HEADLINE & CTAS ── -->
     <div class="hero-text">
       <h1 class="hero-h1">Find Your <span class="hl">Tribe</span></h1>
-      <p class="hero-sub">Real connections, shared experiences, and people who actually get you. Not an algorithm. A community.</p>
+      <p class="hero-sub">Real connections, shared experiences, and people who actually get you. Not an algorithm — a community.</p>
+
       <div class="hero-ctas">
         <a href="{% url 'onboarding' %}" class="btn btn-primary btn-lg">Create a Tribe</a>
         <a href="{% url 'explore' %}" class="btn btn-secondary btn-lg">Explore Tribes</a>
+        <a href="{% url 'explore_events' %}" class="btn-events">
+          <!-- Calendar icon inline -->
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="1" y="2" width="12" height="11" rx="2"/>
+            <path d="M1 5.5h12M4 1v2M10 1v2"/>
+          </svg>
+          Explore Events
+        </a>
       </div>
+
       <div class="trust-row">
         <div class="trust-badge"><div class="trust-dot"></div>12,000+ tribes formed</div>
         <div class="trust-badge"><div class="trust-dot"></div>Real people, real places</div>
         <div class="trust-badge"><div class="trust-dot"></div>No ads, ever</div>
       </div>
     </div>
-  </div>
+
+  </div><!-- /hero-inner -->
 
   <div class="scroll-hint" aria-hidden="true">
-    <span>Scroll</span>
-    <div class="scroll-dot"></div>
+    <div class="scroll-chevron"></div>
   </div>
 </section>
 
-<!-- ═══════════════════ FEATURES (existing) ═══════════════════ -->
+<!-- ════════════════════════════════════════
+     FEATURES
+     ════════════════════════════════════════ -->
 <section class="features-section">
   <div class="container">
     <div class="section-eyebrow">Why Tribesence</div>
     <h2 class="section-title">Built for real life,<br>not screens</h2>
     <p class="section-sub">Every tribe is centred around actually doing things together — not just talking about it.</p>
-
     <div class="features-grid">
       <div class="feat-card">
         <div class="feat-icon">🍜</div>
@@ -939,8 +614,9 @@
   </div>
 </section>
 
-
-<!-- ═══════════════════ HOW IT WORKS ═══════════════════ -->
+<!-- ════════════════════════════════════════
+     HOW IT WORKS
+     ════════════════════════════════════════ -->
 <section class="how-section">
   <div class="container">
     <div class="fade-in-up">
@@ -948,31 +624,19 @@
       <h2 class="section-title">Three steps to<br>finding your people</h2>
       <p class="section-sub">No endless scrolling. No cold DMs. Just a simple flow that gets you from curious to connected.</p>
     </div>
-
     <div class="steps-row fade-in-up">
       <div class="step-item">
-        <div class="step-number-wrap">
-          🧑‍🤝‍🧑
-          <div class="step-num">1</div>
-        </div>
+        <div class="step-number-wrap">🧑‍🤝‍🧑<div class="step-num">1</div></div>
         <div class="step-title">Tell Us About Your Group</div>
         <p class="step-desc">Share a little about who you are, what you love, and the vibe you're after. Takes about 5 minutes.</p>
       </div>
-
       <div class="step-item">
-        <div class="step-number-wrap">
-          🤖
-          <div class="step-num">2</div>
-        </div>
+        <div class="step-number-wrap">🤖<div class="step-num">2</div></div>
         <div class="step-title">AI-Powered Discovery</div>
         <p class="step-desc">Our engine reads the local pulse — events, spots, seasons — and builds a guide crafted exactly for your tribe.</p>
       </div>
-
       <div class="step-item">
-        <div class="step-number-wrap">
-          🗺️
-          <div class="step-num">3</div>
-        </div>
+        <div class="step-number-wrap">🗺️<div class="step-num">3</div></div>
         <div class="step-title">Experience Your Custom Guide</div>
         <p class="step-desc">Get a living, curated plan you can revisit anytime. New recommendations drop as the city changes.</p>
       </div>
@@ -980,8 +644,9 @@
   </div>
 </section>
 
-
-<!-- ═══════════════════ FEATURES / DISCOVERY ═══════════════════ -->
+<!-- ════════════════════════════════════════
+     DISCOVERY
+     ════════════════════════════════════════ -->
 <section class="discovery-section">
   <div class="container">
     <div class="fade-in-up">
@@ -989,17 +654,15 @@
       <h2 class="section-title">Everything your group<br>needs, in one place</h2>
       <p class="section-sub">From the first idea to the last memory — Tribesence keeps the whole journey seamless.</p>
     </div>
-
     <div class="discovery-grid fade-in-up">
       <div class="disc-card">
         <div class="disc-card-img">🏮</div>
         <div class="disc-card-body">
           <div class="disc-icon-badge">🔍</div>
           <div class="disc-card-title">Discover Hidden Gems</div>
-          <p class="disc-card-desc">Uncover the spots locals love but tourists never find — secret rooftops, neighbourhood dhabas, pop-up galleries, and more.</p>
+          <p class="disc-card-desc">Uncover the spots locals love but tourists never find — secret rooftops, neighbourhood dhabas, pop-up galleries.</p>
         </div>
       </div>
-
       <div class="disc-card">
         <div class="disc-card-img">📋</div>
         <div class="disc-card-body">
@@ -1008,7 +671,6 @@
           <p class="disc-card-desc">Built for groups from the ground up. Every suggestion accounts for mixed interests, accessibility, and budget ranges.</p>
         </div>
       </div>
-
       <div class="disc-card">
         <div class="disc-card-img">⭐</div>
         <div class="disc-card-body">
@@ -1021,8 +683,9 @@
   </div>
 </section>
 
-
-<!-- ═══════════════════ WHY CHOOSE TRIBESENCE ═══════════════════ -->
+<!-- ════════════════════════════════════════
+     WHY CHOOSE
+     ════════════════════════════════════════ -->
 <section class="why-section">
   <div class="container">
     <div class="fade-in-up">
@@ -1030,56 +693,31 @@
       <h2 class="section-title">Built different,<br>on purpose</h2>
       <p class="section-sub">We made deliberate choices so your tribe gets more signal, less noise.</p>
     </div>
-
     <div class="why-grid fade-in-up">
-      <div class="why-item">
-        <div class="why-icon">📍</div>
-        <div class="why-title">Local Insights</div>
-        <p class="why-desc">Our data comes from people who actually live in the city — not aggregated review dumps. Hyperlocal, hyper-relevant.</p>
-      </div>
-
-      <div class="why-item">
-        <div class="why-icon">⚡</div>
-        <div class="why-title">Save Time</div>
-        <p class="why-desc">Stop coordinating over 12 browser tabs. One guide, shared with the group, updated automatically as plans evolve.</p>
-      </div>
-
-      <div class="why-item">
-        <div class="why-icon">🛡️</div>
-        <div class="why-title">Trusted Reviews</div>
-        <p class="why-desc">Every place earns its spot through tribe reviews — not ad budgets. Honest ratings from people like you.</p>
-      </div>
+      <div class="why-item"><div class="why-icon">📍</div><div class="why-title">Local Insights</div><p class="why-desc">Our data comes from people who actually live in the city — not aggregated review dumps. Hyperlocal, hyper-relevant.</p></div>
+      <div class="why-item"><div class="why-icon">⚡</div><div class="why-title">Save Time</div><p class="why-desc">Stop coordinating over 12 browser tabs. One guide, shared with the group, updated automatically as plans evolve.</p></div>
+      <div class="why-item"><div class="why-icon">🛡️</div><div class="why-title">Trusted Reviews</div><p class="why-desc">Every place earns its spot through tribe reviews — not ad budgets. Honest ratings from people like you.</p></div>
     </div>
   </div>
 </section>
 
-
-<!-- ═══════════════════ SOCIAL PROOF / STATS ═══════════════════ -->
+<!-- ════════════════════════════════════════
+     STATS
+     ════════════════════════════════════════ -->
 <section class="stats-section">
   <div class="container">
     <div class="stats-grid fade-in-up">
-      <div class="stat-divider">
-        <div class="stat-num">3<span class="stat-accent">K</span>+</div>
-        <div class="stat-label">Amazing Places</div>
-      </div>
-      <div class="stat-divider">
-        <div class="stat-num">50<span class="stat-accent">+</span></div>
-        <div class="stat-label">Event Types</div>
-      </div>
-      <div class="stat-divider">
-        <div class="stat-num">3</div>
-        <div class="stat-label">Cities Covered</div>
-      </div>
-      <div class="stat-divider">
-        <div class="stat-num">12<span class="stat-accent">K</span>+</div>
-        <div class="stat-label">Tribes Formed</div>
-      </div>
+      <div class="stat-divider"><div class="stat-num">3<span class="stat-accent">K</span>+</div><div class="stat-label">Amazing Places</div></div>
+      <div class="stat-divider"><div class="stat-num">50<span class="stat-accent">+</span></div><div class="stat-label">Event Types</div></div>
+      <div class="stat-divider"><div class="stat-num">3</div><div class="stat-label">Cities Covered</div></div>
+      <div class="stat-divider"><div class="stat-num">12<span class="stat-accent">K</span>+</div><div class="stat-label">Tribes Formed</div></div>
     </div>
   </div>
 </section>
 
-
-<!-- ═══════════════════ TESTIMONIALS ═══════════════════ -->
+<!-- ════════════════════════════════════════
+     TESTIMONIALS
+     ════════════════════════════════════════ -->
 <section class="testimonials-section">
   <div class="container">
     <div class="fade-in-up">
@@ -1087,49 +725,29 @@
       <h2 class="section-title">Tribes who found<br>their people</h2>
       <p class="section-sub">From first-timers to regulars — here's what real groups said after their Tribesence guide.</p>
     </div>
-
     <div class="testimonials-grid fade-in-up">
       <div class="testi-card">
         <div class="testi-stars">★★★★★</div>
         <p class="testi-quote">We used Tribesence for our college reunion and it was the first time in years everyone actually agreed on where to go. The guide felt like it knew us.</p>
-        <div class="testi-user">
-          <div class="testi-avatar">🧑</div>
-          <div>
-            <div class="testi-name">Arjun M.</div>
-            <div class="testi-location">Bangalore, India</div>
-          </div>
-        </div>
+        <div class="testi-user"><div class="testi-avatar">🧑</div><div><div class="testi-name">Arjun M.</div><div class="testi-location">Bangalore, India</div></div></div>
       </div>
-
       <div class="testi-card">
         <div class="testi-stars">★★★★★</div>
         <p class="testi-quote">I'm the one who always has to plan everything. Tribesence basically replaced a whole afternoon of research. The recommendations were spot-on, not generic.</p>
-        <div class="testi-user">
-          <div class="testi-avatar">👩</div>
-          <div>
-            <div class="testi-name">Priya S.</div>
-            <div class="testi-location">Mumbai, India</div>
-          </div>
-        </div>
+        <div class="testi-user"><div class="testi-avatar">👩</div><div><div class="testi-name">Priya S.</div><div class="testi-location">Mumbai, India</div></div></div>
       </div>
-
       <div class="testi-card">
         <div class="testi-stars">★★★★★</div>
         <p class="testi-quote">Our team of 8 has wildly different tastes. The guide somehow found things that made everyone happy — including our one vegetarian and one adventure junkie.</p>
-        <div class="testi-user">
-          <div class="testi-avatar">🧑‍💼</div>
-          <div>
-            <div class="testi-name">Kiran R.</div>
-            <div class="testi-location">Hyderabad, India</div>
-          </div>
-        </div>
+        <div class="testi-user"><div class="testi-avatar">🧑‍💼</div><div><div class="testi-name">Kiran R.</div><div class="testi-location">Hyderabad, India</div></div></div>
       </div>
     </div>
   </div>
 </section>
 
-
-<!-- ═══════════════════ FINAL CTA ═══════════════════ -->
+<!-- ════════════════════════════════════════
+     FINAL CTA
+     ════════════════════════════════════════ -->
 <section class="cta-section">
   <div class="container">
     <div class="cta-inner fade-in-up">
@@ -1140,28 +758,17 @@
         <a href="{% url 'onboarding' %}" class="btn btn-primary btn-lg">Get Started Free</a>
       </div>
       <div class="cta-highlights">
-        <div class="cta-highlight">
-          <div class="cta-highlight-icon">🎉</div>
-          <div class="cta-highlight-label">Free</div>
-          <div class="cta-highlight-sub">Always, for core features</div>
-        </div>
-        <div class="cta-highlight">
-          <div class="cta-highlight-icon">⏱️</div>
-          <div class="cta-highlight-label">5 min setup</div>
-          <div class="cta-highlight-sub">No lengthy onboarding</div>
-        </div>
-        <div class="cta-highlight">
-          <div class="cta-highlight-icon">🗂️</div>
-          <div class="cta-highlight-label">3 experiences / month</div>
-          <div class="cta-highlight-sub">On the free plan</div>
-        </div>
+        <div class="cta-highlight"><div class="cta-highlight-icon">🎉</div><div class="cta-highlight-label">Free</div><div class="cta-highlight-sub">Always, for core features</div></div>
+        <div class="cta-highlight"><div class="cta-highlight-icon">⏱️</div><div class="cta-highlight-label">5 min setup</div><div class="cta-highlight-sub">No lengthy onboarding</div></div>
+        <div class="cta-highlight"><div class="cta-highlight-icon">🗂️</div><div class="cta-highlight-label">3 experiences / month</div><div class="cta-highlight-sub">On the free plan</div></div>
       </div>
     </div>
   </div>
 </section>
 
-
-<!-- ═══════════════════ FOOTER ═══════════════════ -->
+<!-- ════════════════════════════════════════
+     FOOTER
+     ════════════════════════════════════════ -->
 <footer class="site-footer">
   <div class="container">
     <div class="footer-grid">
@@ -1170,17 +777,15 @@
         <p class="footer-desc">Real connections. Shared experiences. People who actually get you. Not an algorithm — a community.</p>
         <a href="mailto:hello@tribesence.com" class="footer-email">hello@tribesence.com</a>
       </div>
-
       <div>
         <div class="footer-col-title">Product</div>
         <ul class="footer-links">
           <li><a href="{% url 'explore' %}">Explore Tribes</a></li>
+          <li><a href="{% url 'explore_events' %}">Explore Events</a></li>
           <li><a href="{% url 'onboarding' %}">Create a Tribe</a></li>
           <li><a href="{% url 'login' %}">Sign In</a></li>
-          <li><a href="{% url 'signup' %}">Create Account</a></li>
         </ul>
       </div>
-
       <div>
         <div class="footer-col-title">Company</div>
         <ul class="footer-links">
@@ -1191,16 +796,13 @@
         </ul>
       </div>
     </div>
-
     <div class="footer-bottom">
       <div class="footer-copy">© 2025 Tribesence. All rights reserved.</div>
-      <div class="footer-legal">
-        <a href="#">Privacy Policy</a>
-        <a href="#">Terms of Service</a>
-      </div>
+      <div class="footer-legal"><a href="#">Privacy Policy</a><a href="#">Terms of Service</a></div>
     </div>
   </div>
 </footer>
+
 {% endblock %}
 
 {% block extra_js %}
