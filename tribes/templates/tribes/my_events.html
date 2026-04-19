@@ -1,0 +1,405 @@
+{% extends 'core/base.html' %}
+{% block title %}My Events — Tribesence{% endblock %}
+{% block nav_my_events %}active{% endblock %}
+{% block dd_events %}active-page{% endblock %}
+
+{% block extra_head %}
+<style>
+/* ════════════════════════════════════════
+   MY EVENTS PAGE
+   ════════════════════════════════════════ */
+
+.page-hero {
+  padding: 108px 0 48px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+}
+.page-eyebrow {
+  font-size: 11px; font-weight: 800; letter-spacing: 2.5px;
+  text-transform: uppercase; color: var(--primary); margin-bottom: 12px;
+}
+.page-title {
+  font-family: var(--font-display);
+  font-size: clamp(30px, 4.5vw, 46px); font-weight: 800;
+  letter-spacing: -1.8px; line-height: 1.08;
+  color: var(--text-primary); margin-bottom: 10px;
+}
+.page-sub { font-size: 15px; color: var(--text-secondary); line-height: 1.7; max-width: 480px; }
+
+/* Tab bar */
+.tab-bar { display: flex; gap: 4px; margin-top: 28px; }
+.tab-btn {
+  padding: 8px 18px; border-radius: var(--r-full);
+  font-size: 13px; font-weight: 600; cursor: pointer;
+  border: none; font-family: var(--font-body);
+  background: transparent; color: var(--text-muted);
+  transition: all var(--t-fast);
+}
+.tab-btn:hover  { background: var(--surface-low); color: var(--text-primary); }
+.tab-btn.active { background: var(--secondary); color: #fff; }
+
+/* Main area */
+.events-main { padding: 52px 0 80px; }
+
+/* Empty state */
+.empty-state {
+  display: flex; flex-direction: column; align-items: center;
+  text-align: center; padding: 80px 24px; max-width: 400px; margin: 0 auto;
+}
+.empty-icon { width: 80px; height: 80px; border-radius: 50%; background: var(--primary-light); display: flex; align-items: center; justify-content: center; font-size: 34px; margin-bottom: 24px; }
+.empty-title { font-family: var(--font-display); font-size: 22px; font-weight: 800; letter-spacing: -0.6px; color: var(--text-primary); margin-bottom: 10px; }
+.empty-sub { font-size: 15px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 28px; }
+
+/* ── Event list ── */
+.events-list { display: flex; flex-direction: column; gap: 18px; }
+
+/* ── Event card (horizontal, same structure as explore_events) ── */
+.my-event-card {
+  background: var(--surface);
+  border-radius: var(--r-card);
+  display: flex; overflow: hidden;
+  box-shadow: var(--shadow-card);
+  cursor: pointer;
+  opacity: 0; transform: translateY(14px);
+  position: relative;
+}
+.my-event-card.visible {
+  transition: opacity 0.4s ease, transform 0.4s ease, box-shadow var(--t-base);
+  opacity: 1; transform: translateY(0);
+}
+.my-event-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-warm); }
+
+/* Status left-edge bar */
+.my-event-card::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 4px;
+  border-radius: 0;
+}
+.my-event-card.status-upcoming::before  { background: var(--primary-gradient); }
+.my-event-card.status-today::before     { background: linear-gradient(180deg, var(--accent), #c9a130); }
+.my-event-card.status-past::before      { background: var(--border); }
+.my-event-card.status-cancelled::before { background: rgba(192,57,43,0.5); }
+
+/* Image column */
+.event-img {
+  width: 150px; min-height: 140px;
+  flex-shrink: 0; display: flex; align-items: center; justify-content: center;
+  font-size: 42px; position: relative;
+  margin-left: 4px;         /* offset for the status bar */
+}
+
+/* Date badge */
+.event-date-badge {
+  position: absolute; top: 12px; left: 12px;
+  background: var(--surface); border-radius: 10px;
+  padding: 5px 10px; text-align: center;
+  box-shadow: 0 2px 8px rgba(43,30,20,0.12);
+}
+.event-date-badge .day { font-family: var(--font-display); font-size: 20px; font-weight: 800; line-height: 1; color: var(--primary); display: block; }
+.event-date-badge .month { font-size: 10px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: var(--text-secondary); }
+
+/* Content column */
+.event-content {
+  flex: 1; padding: 18px 20px;
+  display: flex; flex-direction: column; justify-content: space-between;
+}
+.event-top { display: flex; flex-direction: column; gap: 6px; }
+
+/* Status + category badges */
+.event-badges { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 2px; }
+.event-badge {
+  font-size: 10px; font-weight: 800; letter-spacing: 1px;
+  text-transform: uppercase; padding: 3px 8px; border-radius: var(--r-full);
+}
+.badge-upcoming  { background: var(--primary-light); color: var(--primary); }
+.badge-today     { background: var(--accent-bg); color: var(--accent-text); }
+.badge-past      { background: var(--surface-low); color: var(--text-muted); }
+.badge-cancelled { background: rgba(192,57,43,0.1); color: #a93226; }
+.badge-category  { background: rgba(38,70,83,0.08); color: var(--secondary); }
+.badge-tribe     { background: var(--primary-light); color: var(--primary); }
+
+.event-title {
+  font-family: var(--font-display);
+  font-size: 16px; font-weight: 700;
+  color: var(--text-primary); letter-spacing: -0.3px; line-height: 1.35;
+}
+.my-event-card:hover .event-title { color: var(--primary); }
+.event-title.past-title { color: var(--text-secondary); }
+
+.event-meta { display: flex; flex-direction: column; gap: 4px; font-size: 13px; color: var(--text-secondary); }
+.event-meta-row { display: flex; align-items: center; gap: 7px; }
+.event-meta-icon { font-size: 13px; flex-shrink: 0; }
+
+/* Tribe chip */
+.event-tribe-chip {
+  display: inline-flex; align-items: center; gap: 5px;
+  font-size: 12px; font-weight: 600; color: var(--secondary);
+  background: rgba(38,70,83,0.07); padding: 3px 10px;
+  border-radius: var(--r-full);
+}
+
+/* Footer */
+.event-footer {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border);
+}
+.event-price { font-family: var(--font-display); font-size: 15px; font-weight: 700; color: var(--text-primary); }
+.event-price.free { color: #1e8449; }
+.event-price.past { color: var(--text-muted); }
+
+.event-action-btn {
+  padding: 7px 16px; border-radius: var(--r-sm);
+  font-size: 12px; font-weight: 700; cursor: pointer;
+  font-family: var(--font-body); border: 1.5px solid transparent;
+  transition: all var(--t-fast); text-decoration: none;
+}
+.btn-view-detail { background: var(--secondary); color: #fff; border-color: var(--secondary); }
+.btn-view-detail:hover { background: var(--secondary-hover); }
+.btn-cancel-reg { background: transparent; color: var(--text-muted); border-color: var(--border); }
+.btn-cancel-reg:hover { color: #c0392b; border-color: rgba(192,57,43,0.4); background: rgba(192,57,43,0.05); }
+.btn-rate { background: var(--accent-bg); color: var(--accent-text); border-color: transparent; }
+.btn-rate:hover { background: rgba(233,196,106,0.3); }
+
+@media (max-width: 640px) {
+  .my-event-card { flex-direction: column; }
+  .event-img { width: 100%; height: 120px; margin-left: 0; }
+  .my-event-card::before { top: 0; left: 0; right: 0; bottom: auto; width: 100%; height: 4px; }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+
+<!-- ── PAGE HERO ── -->
+<section class="page-hero">
+  <div class="container">
+    <div class="page-eyebrow">Your calendar</div>
+    <h1 class="page-title">My Events</h1>
+    <p class="page-sub">Every event you've registered for — upcoming, ongoing, and past.</p>
+
+    <div class="tab-bar">
+      <button class="tab-btn active" onclick="switchTab('upcoming', this)">
+        Upcoming ({{ upcoming_events|length }})
+      </button>
+      <button class="tab-btn" onclick="switchTab('past', this)">
+        Past ({{ past_events|length }})
+      </button>
+    </div>
+  </div>
+</section>
+
+<!-- ── MAIN CONTENT ── -->
+<div class="events-main">
+  <div class="container">
+
+    <!-- UPCOMING EVENTS TAB -->
+    <div id="tab-upcoming">
+      {% if upcoming_events %}
+        <div class="events-list">
+          {% for ev in upcoming_events %}
+          <div class="my-event-card status-{{ ev.status }}">
+
+            <div class="event-img" style="background:{{ ev.bg }}">
+              {{ ev.icon }}
+              <div class="event-date-badge">
+                <span class="day">{{ ev.day }}</span>
+                <span class="month">{{ ev.month }}</span>
+              </div>
+            </div>
+
+            <div class="event-content">
+              <div class="event-top">
+                <div class="event-badges">
+                  <span class="event-badge badge-{{ ev.status }}">{{ ev.status|title }}</span>
+                  <span class="event-badge badge-category">{{ ev.category }}</span>
+                  {% if ev.tribe_name %}<span class="event-badge badge-tribe">{{ ev.tribe_name }}</span>{% endif %}
+                </div>
+                <div class="event-title">{{ ev.title }}</div>
+                <div class="event-meta">
+                  <div class="event-meta-row">
+                    <span class="event-meta-icon">🕐</span>{{ ev.month }} {{ ev.day }} · {{ ev.time }}
+                  </div>
+                  <div class="event-meta-row">
+                    <span class="event-meta-icon">📍</span>{{ ev.location }}
+                  </div>
+                  {% if ev.tribe_name %}
+                  <div class="event-meta-row" style="margin-top:2px">
+                    <span class="event-tribe-chip">🔥 {{ ev.tribe_name }}</span>
+                  </div>
+                  {% endif %}
+                </div>
+              </div>
+
+              <div class="event-footer">
+                <div class="event-price {% if ev.price == 'Free' %}free{% endif %}">
+                  {{ ev.price }}
+                </div>
+                <div style="display:flex;gap:6px">
+                  <a href="{% url 'explore_events' %}" class="event-action-btn btn-view-detail">Details</a>
+                  {% if ev.status != 'today' %}
+                  <button class="event-action-btn btn-cancel-reg"
+                          onclick="confirmCancel('{{ ev.id }}', '{{ ev.title|escapejs }}')">
+                    Cancel
+                  </button>
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+
+          </div>
+          {% endfor %}
+        </div>
+
+      {% else %}
+        <div class="empty-state">
+          <div class="empty-icon">📅</div>
+          <div class="empty-title">Nothing coming up</div>
+          <p class="empty-sub">You're not registered for any upcoming events. Explore what's happening in your city.</p>
+          <a href="{% url 'explore_events' %}" class="btn btn-primary">Explore Events</a>
+        </div>
+      {% endif %}
+    </div>
+
+    <!-- PAST EVENTS TAB -->
+    <div id="tab-past" style="display:none">
+      {% if past_events %}
+        <div class="events-list">
+          {% for ev in past_events %}
+          <div class="my-event-card status-past">
+
+            <div class="event-img" style="background:{{ ev.bg }};opacity:0.7">
+              {{ ev.icon }}
+              <div class="event-date-badge">
+                <span class="day" style="color:var(--text-muted)">{{ ev.day }}</span>
+                <span class="month">{{ ev.month }}</span>
+              </div>
+            </div>
+
+            <div class="event-content">
+              <div class="event-top">
+                <div class="event-badges">
+                  <span class="event-badge badge-past">Attended</span>
+                  <span class="event-badge badge-category">{{ ev.category }}</span>
+                </div>
+                <div class="event-title past-title">{{ ev.title }}</div>
+                <div class="event-meta">
+                  <div class="event-meta-row"><span class="event-meta-icon">🕐</span>{{ ev.month }} {{ ev.day }} · {{ ev.time }}</div>
+                  <div class="event-meta-row"><span class="event-meta-icon">📍</span>{{ ev.location }}</div>
+                </div>
+              </div>
+
+              <div class="event-footer">
+                <div class="event-price past">{{ ev.price }}</div>
+                <div style="display:flex;gap:6px">
+                  <button class="event-action-btn btn-rate" onclick="openRating('{{ ev.id }}', '{{ ev.title|escapejs }}')">
+                    ★ Rate
+                  </button>
+                </div>
+              </div>
+            </div>
+
+          </div>
+          {% endfor %}
+        </div>
+
+      {% else %}
+        <div class="empty-state">
+          <div class="empty-icon">🏁</div>
+          <div class="empty-title">No history yet</div>
+          <p class="empty-sub">Your attended events will appear here. Go create some memories.</p>
+          <a href="{% url 'explore_events' %}" class="btn btn-secondary">Find Events</a>
+        </div>
+      {% endif %}
+    </div>
+
+  </div>
+</div>
+
+<!-- Cancel confirm -->
+<div id="cancelModal" style="display:none;position:fixed;inset:0;background:rgba(26,17,10,0.5);backdrop-filter:blur(8px);z-index:900;align-items:center;justify-content:center">
+  <div style="background:var(--surface);border-radius:var(--r-xl);padding:40px;max-width:380px;width:90%;text-align:center;box-shadow:var(--shadow-float)">
+    <div style="font-size:40px;margin-bottom:16px">🗓️</div>
+    <div style="font-family:var(--font-display);font-size:22px;font-weight:800;letter-spacing:-0.6px;margin-bottom:10px;color:var(--text-primary)">Cancel registration?</div>
+    <p id="cancelModalText" style="font-size:14px;color:var(--text-secondary);line-height:1.6;margin-bottom:28px"></p>
+    <div style="display:flex;gap:10px">
+      <button onclick="closeCancelModal()" class="btn btn-secondary" style="flex:1">Keep it</button>
+      <button onclick="doCancel()" class="btn btn-primary btn-full" style="flex:1;background:linear-gradient(135deg,#c0392b,#96281b)">Cancel spot</button>
+    </div>
+  </div>
+</div>
+
+<!-- Rating modal -->
+<div id="ratingModal" style="display:none;position:fixed;inset:0;background:rgba(26,17,10,0.5);backdrop-filter:blur(8px);z-index:900;align-items:center;justify-content:center">
+  <div style="background:var(--surface);border-radius:var(--r-xl);padding:40px;max-width:380px;width:90%;text-align:center;box-shadow:var(--shadow-float)">
+    <div style="font-size:40px;margin-bottom:16px">⭐</div>
+    <div style="font-family:var(--font-display);font-size:20px;font-weight:800;letter-spacing:-0.5px;margin-bottom:8px;color:var(--text-primary)" id="ratingTitle"></div>
+    <p style="font-size:14px;color:var(--text-secondary);line-height:1.6;margin-bottom:20px">How was the experience?</p>
+    <!-- Stars -->
+    <div style="display:flex;justify-content:center;gap:8px;margin-bottom:24px" id="starRow">
+      {% for i in "12345" %}<span style="font-size:32px;cursor:pointer;opacity:0.35;transition:opacity 0.15s" onclick="rateEvent({{ forloop.counter }})" onmouseover="hoverStars({{ forloop.counter }})" onmouseout="unhoverStars()" id="star-{{ forloop.counter }}">★</span>{% endfor %}
+    </div>
+    <button onclick="submitRating()" class="btn btn-primary btn-full">Submit rating</button>
+    <button onclick="closeRatingModal()" style="display:block;margin:12px auto 0;background:none;border:none;font-size:13px;color:var(--text-muted);cursor:pointer;font-family:var(--font-body)">Skip for now</button>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+/* Tab switching */
+function switchTab(tabId, btn) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('tab-upcoming').style.display = tabId === 'upcoming' ? '' : 'none';
+  document.getElementById('tab-past').style.display     = tabId === 'past'     ? '' : 'none';
+}
+
+/* Staggered entrance */
+document.querySelectorAll('.my-event-card').forEach((card, i) => {
+  setTimeout(() => card.classList.add('visible'), i * 70);
+});
+
+/* Cancel registration */
+let cancelId = null;
+function confirmCancel(id, title) {
+  cancelId = id;
+  document.getElementById('cancelModalText').textContent =
+    `Your spot at "${title}" will be released. This cannot be undone.`;
+  document.getElementById('cancelModal').style.display = 'flex';
+}
+function closeCancelModal() {
+  document.getElementById('cancelModal').style.display = 'none';
+}
+function doCancel() {
+  closeCancelModal();
+  /* In real implementation: POST to /events/cancel/<id>/ */
+  alert('Registration cancelled. Your spot has been freed up.');
+}
+
+/* Rating */
+let currentRating = 0;
+let ratingEventId = null;
+function openRating(id, title) {
+  ratingEventId = id;
+  document.getElementById('ratingTitle').textContent = title;
+  currentRating = 0; unhoverStars();
+  document.getElementById('ratingModal').style.display = 'flex';
+}
+function closeRatingModal() { document.getElementById('ratingModal').style.display = 'none'; }
+function hoverStars(n) { for (let i=1;i<=5;i++) document.getElementById('star-'+i).style.opacity = i<=n?'1':'0.35'; }
+function unhoverStars() { for (let i=1;i<=5;i++) document.getElementById('star-'+i).style.opacity = i<=currentRating?'1':'0.35'; }
+function rateEvent(n) { currentRating = n; unhoverStars(); }
+function submitRating() {
+  if (!currentRating) { alert('Please select a rating first.'); return; }
+  closeRatingModal();
+  alert(`Thanks for rating! Your ${currentRating}-star review helps the tribe. 🔥`);
+}
+
+/* Close modals on backdrop click */
+document.getElementById('cancelModal')?.addEventListener('click', e => { if (e.target === document.getElementById('cancelModal')) closeCancelModal(); });
+document.getElementById('ratingModal')?.addEventListener('click', e => { if (e.target === document.getElementById('ratingModal')) closeRatingModal(); });
+</script>
+{% endblock %}

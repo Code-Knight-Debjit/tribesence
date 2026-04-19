@@ -1,0 +1,468 @@
+{% extends 'core/base.html' %}
+{% block title %}My Tribes — Tribesence{% endblock %}
+{% block nav_my_tribes %}active{% endblock %}
+{% block dd_tribes %}active-page{% endblock %}
+
+{% block extra_head %}
+<style>
+/* ════════════════════════════════════════
+   MY TRIBES PAGE
+   ════════════════════════════════════════ */
+
+/* Hero bar */
+.page-hero {
+  padding: 108px 0 48px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+}
+.page-eyebrow {
+  font-size: 11px; font-weight: 800; letter-spacing: 2.5px;
+  text-transform: uppercase; color: var(--primary); margin-bottom: 12px;
+}
+.page-title {
+  font-family: var(--font-display);
+  font-size: clamp(30px, 4.5vw, 46px);
+  font-weight: 800; letter-spacing: -1.8px; line-height: 1.08;
+  color: var(--text-primary); margin-bottom: 10px;
+}
+.page-sub {
+  font-size: 15px; color: var(--text-secondary); line-height: 1.7; max-width: 480px;
+}
+
+/* Tab bar */
+.tab-bar {
+  display: flex; gap: 4px;
+  margin-top: 28px;
+}
+.tab-btn {
+  padding: 8px 18px; border-radius: var(--r-full);
+  font-size: 13px; font-weight: 600; cursor: pointer;
+  border: none; font-family: var(--font-body);
+  background: transparent; color: var(--text-muted);
+  transition: all var(--t-fast);
+}
+.tab-btn:hover  { background: var(--surface-low); color: var(--text-primary); }
+.tab-btn.active { background: var(--secondary); color: #fff; }
+
+/* Main content area */
+.tribes-main { padding: 52px 0 80px; }
+
+/* ── Empty state ── */
+.empty-state {
+  display: flex; flex-direction: column; align-items: center;
+  justify-content: center; text-align: center;
+  padding: 80px 24px; max-width: 420px; margin: 0 auto;
+}
+.empty-icon {
+  width: 80px; height: 80px; border-radius: 50%;
+  background: var(--primary-light);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 34px; margin-bottom: 24px;
+}
+.empty-title {
+  font-family: var(--font-display);
+  font-size: 22px; font-weight: 800; letter-spacing: -0.6px;
+  color: var(--text-primary); margin-bottom: 10px;
+}
+.empty-sub {
+  font-size: 15px; color: var(--text-secondary);
+  line-height: 1.7; margin-bottom: 28px;
+}
+
+/* ── Tribe card grid ── */
+.my-tribes-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 24px;
+}
+
+/* ── My tribe card ── */
+.my-tribe-card {
+  background: var(--surface);
+  border-radius: var(--r-card);
+  overflow: hidden;
+  box-shadow: var(--shadow-card);
+  transition: transform var(--t-base), box-shadow var(--t-base);
+  display: flex; flex-direction: column;
+  opacity: 0; transform: translateY(16px);
+}
+.my-tribe-card.visible {
+  transition: opacity 0.4s ease, transform 0.4s ease, box-shadow var(--t-base);
+  opacity: 1; transform: translateY(0);
+}
+.my-tribe-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-warm); }
+
+/* Role badge strip at top */
+.card-role-strip {
+  height: 4px;
+}
+.role-creator { background: var(--primary-gradient); }
+.role-admin   { background: linear-gradient(90deg, var(--accent) 0%, #c9a130 100%); }
+.role-member  { background: linear-gradient(90deg, #264653 0%, #3a6b7a 100%); }
+
+.card-body { padding: 22px 24px 20px; flex: 1; display: flex; flex-direction: column; gap: 14px; }
+
+/* Card top row */
+.card-top { display: flex; align-items: flex-start; gap: 14px; }
+.card-avatar {
+  width: 52px; height: 52px; border-radius: 14px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 24px; flex-shrink: 0;
+}
+.card-info { flex: 1; min-width: 0; }
+.card-name {
+  font-family: var(--font-display);
+  font-size: 17px; font-weight: 700;
+  color: var(--text-primary); letter-spacing: -0.3px;
+  margin-bottom: 4px;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.card-role-badge {
+  display: inline-flex; align-items: center; gap: 4px;
+  font-size: 11px; font-weight: 700; letter-spacing: 0.5px;
+  text-transform: uppercase; padding: 3px 8px;
+  border-radius: var(--r-full);
+}
+.badge-creator { background: var(--primary-light); color: var(--primary); }
+.badge-admin   { background: var(--accent-bg);     color: var(--accent-text); }
+.badge-member  { background: rgba(38,70,83,0.08);  color: var(--secondary); }
+
+/* Card description */
+.card-desc {
+  font-size: 14px; color: var(--text-secondary); line-height: 1.6;
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+}
+
+/* Tags */
+.card-tags { display: flex; gap: 6px; flex-wrap: wrap; }
+
+/* Activity preview */
+.card-activity {
+  background: var(--surface-low);
+  border-radius: 10px; padding: 12px 14px;
+}
+.card-activity-label {
+  font-size: 10px; font-weight: 800; letter-spacing: 1.5px;
+  text-transform: uppercase; color: var(--text-muted); margin-bottom: 8px;
+}
+.activity-row {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 13px; color: var(--text-secondary);
+}
+.activity-pip {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--primary); flex-shrink: 0; opacity: 0.7;
+}
+
+/* Card footer */
+.card-footer {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 14px 24px;
+  border-top: 1px solid var(--border);
+  background: var(--surface);
+}
+.card-members {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 13px; color: var(--text-secondary); font-weight: 500;
+}
+.member-stack { display: flex; }
+.member-pip {
+  width: 24px; height: 24px; border-radius: 50%;
+  border: 2px solid var(--surface); margin-left: -8px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 9px; font-weight: 700; color: #fff;
+}
+.member-pip:first-child { margin-left: 0; }
+.card-actions { display: flex; gap: 6px; }
+
+.card-action-btn {
+  padding: 6px 14px; border-radius: var(--r-sm);
+  font-size: 12px; font-weight: 700;
+  cursor: pointer; font-family: var(--font-body);
+  border: 1.5px solid transparent;
+  transition: all var(--t-fast);
+}
+.btn-view { background: var(--secondary); color: #fff; border-color: var(--secondary); }
+.btn-view:hover { background: var(--secondary-hover); }
+.btn-leave { background: transparent; color: var(--text-muted); border-color: var(--border); }
+.btn-leave:hover { color: #c0392b; border-color: rgba(192,57,43,0.4); background: rgba(192,57,43,0.05); }
+
+/* Joined date */
+.card-joined {
+  font-size: 11px; color: var(--text-muted); padding: 0 24px 14px;
+}
+
+/* Summary stats row */
+.stats-strip {
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  gap: 1px; background: var(--border);
+  border-top: 1px solid var(--border);
+  border-bottom-left-radius: var(--r-card);
+  border-bottom-right-radius: var(--r-card);
+  overflow: hidden;
+}
+.stat-cell {
+  background: var(--surface);
+  padding: 14px 16px; text-align: center;
+}
+.stat-val {
+  font-family: var(--font-display);
+  font-size: 18px; font-weight: 800;
+  color: var(--text-primary); line-height: 1;
+  margin-bottom: 3px;
+}
+.stat-lbl { font-size: 11px; color: var(--text-muted); font-weight: 500; }
+
+/* Created tribes section */
+.section-divider {
+  display: flex; align-items: center; gap: 16px;
+  margin-bottom: 28px;
+}
+.section-divider-line { flex: 1; height: 1px; background: var(--border); }
+.section-divider-label {
+  font-size: 11px; font-weight: 800; letter-spacing: 2px;
+  text-transform: uppercase; color: var(--text-muted);
+  white-space: nowrap;
+}
+
+@media (max-width: 768px) {
+  .my-tribes-grid { grid-template-columns: 1fr; }
+  .tab-bar { overflow-x: auto; }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+
+<!-- ── PAGE HERO ── -->
+<section class="page-hero">
+  <div class="container">
+    <div class="page-eyebrow">Your communities</div>
+    <h1 class="page-title">My Tribes</h1>
+    <p class="page-sub">Every tribe you're a part of — your role, your people, your next move.</p>
+
+    <!-- Tab bar -->
+    <div class="tab-bar">
+      <button class="tab-btn active" onclick="switchTab('joined', this)">Joined ({{ joined_tribes|length }})</button>
+      <button class="tab-btn" onclick="switchTab('created', this)">Created ({{ created_tribes|length }})</button>
+    </div>
+  </div>
+</section>
+
+<!-- ── MAIN CONTENT ── -->
+<div class="tribes-main">
+  <div class="container">
+
+    <!-- JOINED TRIBES TAB -->
+    <div id="tab-joined">
+      {% if joined_tribes %}
+        <div class="my-tribes-grid">
+          {% for item in joined_tribes %}
+          <div class="my-tribe-card">
+            <!-- Role colour strip -->
+            <div class="card-role-strip role-{{ item.membership.role }}"></div>
+
+            <div class="card-body">
+              <!-- Top row -->
+              <div class="card-top">
+                <div class="card-avatar" style="background:{{ item.tribe.icon_bg }}">{{ item.tribe.icon }}</div>
+                <div class="card-info">
+                  <div class="card-name">{{ item.tribe.name }}</div>
+                  <span class="card-role-badge badge-{{ item.membership.role }}">
+                    {% if item.membership.role == 'creator' %}⭐{% elif item.membership.role == 'admin' %}🛡{% else %}👤{% endif %}
+                    {{ item.membership.get_role_display }}
+                  </span>
+                </div>
+              </div>
+
+              <!-- Description -->
+              <p class="card-desc">{{ item.tribe.description }}</p>
+
+              <!-- Tags -->
+              <div class="card-tags">
+                {% for tag in item.tribe.get_tags_list %}
+                  <span class="tag">{{ tag }}</span>
+                {% endfor %}
+              </div>
+
+              <!-- Activity -->
+              <div class="card-activity">
+                <div class="card-activity-label">Recent Activity</div>
+                {% for act in item.activity %}
+                <div class="activity-row">
+                  <div class="activity-pip"></div>
+                  <span>{{ act }}</span>
+                </div>
+                {% endfor %}
+              </div>
+            </div>
+
+            <!-- Stats strip -->
+            <div class="stats-strip">
+              <div class="stat-cell">
+                <div class="stat-val">{{ item.tribe.member_count }}</div>
+                <div class="stat-lbl">Members</div>
+              </div>
+              <div class="stat-cell">
+                <div class="stat-val">{{ item.events_count }}</div>
+                <div class="stat-lbl">Events</div>
+              </div>
+              <div class="stat-cell">
+                <div class="stat-val">{{ item.days_since }}</div>
+                <div class="stat-lbl">Days in</div>
+              </div>
+            </div>
+
+            <!-- Footer actions -->
+            <div class="card-footer">
+              <div class="card-members">
+                <div class="member-stack">
+                  <div class="member-pip" style="background:#E76F51">A</div>
+                  <div class="member-pip" style="background:#264653">B</div>
+                  <div class="member-pip" style="background:#C9A130">C</div>
+                </div>
+                <span>{{ item.tribe.member_count }} members</span>
+              </div>
+              <div class="card-actions">
+                <a href="{% url 'explore' %}" class="card-action-btn btn-view">View</a>
+                {% if item.membership.role != 'creator' %}
+                <button class="card-action-btn btn-leave"
+                        onclick="confirmLeave('{{ item.tribe.id }}', '{{ item.tribe.name }}')">
+                  Leave
+                </button>
+                {% endif %}
+              </div>
+            </div>
+
+            <div class="card-joined">Joined {{ item.membership.joined_at|date:"M j, Y" }}</div>
+          </div>
+          {% endfor %}
+        </div>
+
+      {% else %}
+        <div class="empty-state">
+          <div class="empty-icon">🔥</div>
+          <div class="empty-title">No tribes yet</div>
+          <p class="empty-sub">You haven't joined any tribes. Find your people in the explore feed — or create your own.</p>
+          <a href="{% url 'explore' %}" class="btn btn-primary">Explore Tribes</a>
+        </div>
+      {% endif %}
+    </div>
+
+    <!-- CREATED TRIBES TAB -->
+    <div id="tab-created" style="display:none">
+      {% if created_tribes %}
+        <div class="my-tribes-grid">
+          {% for item in created_tribes %}
+          <div class="my-tribe-card">
+            <div class="card-role-strip role-creator"></div>
+            <div class="card-body">
+              <div class="card-top">
+                <div class="card-avatar" style="background:{{ item.tribe.icon_bg }}">{{ item.tribe.icon }}</div>
+                <div class="card-info">
+                  <div class="card-name">{{ item.tribe.name }}</div>
+                  <span class="card-role-badge badge-creator">⭐ Creator</span>
+                </div>
+              </div>
+              <p class="card-desc">{{ item.tribe.description }}</p>
+              <div class="card-tags">
+                {% for tag in item.tribe.get_tags_list %}
+                  <span class="tag">{{ tag }}</span>
+                {% endfor %}
+              </div>
+              <div class="card-activity">
+                <div class="card-activity-label">Your tribe</div>
+                {% for act in item.activity %}
+                <div class="activity-row"><div class="activity-pip"></div><span>{{ act }}</span></div>
+                {% endfor %}
+              </div>
+            </div>
+            <div class="stats-strip">
+              <div class="stat-cell"><div class="stat-val">{{ item.tribe.member_count }}</div><div class="stat-lbl">Members</div></div>
+              <div class="stat-cell"><div class="stat-val">{{ item.events_count }}</div><div class="stat-lbl">Events</div></div>
+              <div class="stat-cell"><div class="stat-val">{{ item.days_since }}</div><div class="stat-lbl">Days old</div></div>
+            </div>
+            <div class="card-footer">
+              <div class="card-members">
+                <div class="member-stack">
+                  <div class="member-pip" style="background:#E76F51">A</div>
+                  <div class="member-pip" style="background:#264653">B</div>
+                  <div class="member-pip" style="background:#C9A130">C</div>
+                </div>
+                <span>{{ item.tribe.member_count }} members</span>
+              </div>
+              <div class="card-actions">
+                <a href="{% url 'explore' %}" class="card-action-btn btn-view">Manage</a>
+              </div>
+            </div>
+            <div class="card-joined">Created {{ item.tribe.created_at|date:"M j, Y" }}</div>
+          </div>
+          {% endfor %}
+        </div>
+
+      {% else %}
+        <div class="empty-state">
+          <div class="empty-icon">✨</div>
+          <div class="empty-title">Build something</div>
+          <p class="empty-sub">You haven't created a tribe yet. Start one around something you love — it only takes 5 minutes.</p>
+          <a href="{% url 'onboarding' %}" class="btn btn-primary">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="7" cy="7" r="6"/><line x1="7" y1="4" x2="7" y2="10"/><line x1="4" y1="7" x2="10" y2="7"/></svg>
+            Create a Tribe
+          </a>
+        </div>
+      {% endif %}
+    </div>
+
+  </div>
+</div>
+
+<!-- Leave confirm modal -->
+<div id="leaveModal" style="display:none;position:fixed;inset:0;background:rgba(26,17,10,0.5);backdrop-filter:blur(8px);z-index:900;align-items:center;justify-content:center">
+  <div style="background:var(--surface);border-radius:var(--r-xl);padding:40px;max-width:380px;width:90%;text-align:center;box-shadow:var(--shadow-float)">
+    <div style="font-size:40px;margin-bottom:16px">👋</div>
+    <div style="font-family:var(--font-display);font-size:22px;font-weight:800;letter-spacing:-0.6px;margin-bottom:10px;color:var(--text-primary)">Leave this tribe?</div>
+    <p id="leaveModalText" style="font-size:14px;color:var(--text-secondary);line-height:1.6;margin-bottom:28px"></p>
+    <div style="display:flex;gap:10px">
+      <button onclick="closeLeaveModal()" class="btn btn-secondary" style="flex:1">Stay</button>
+      <form id="leaveForm" method="POST" style="flex:1">
+        {% csrf_token %}
+        <input type="hidden" name="tribe_id" id="leaveTribeId">
+        <button type="submit" class="btn btn-primary btn-full" style="background:linear-gradient(135deg,#c0392b,#96281b)">Yes, leave</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+/* Tab switching */
+function switchTab(tabId, btn) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('tab-joined').style.display  = tabId === 'joined'  ? '' : 'none';
+  document.getElementById('tab-created').style.display = tabId === 'created' ? '' : 'none';
+}
+
+/* Staggered card entrance */
+document.querySelectorAll('.my-tribe-card').forEach((card, i) => {
+  setTimeout(() => card.classList.add('visible'), i * 80);
+});
+
+/* Leave confirm */
+function confirmLeave(tribeId, tribeName) {
+  document.getElementById('leaveModalText').textContent =
+    `You'll be removed from "${tribeName}". You can always rejoin later.`;
+  document.getElementById('leaveTribeId').value = tribeId;
+  document.getElementById('leaveForm').action = '/tribes/leave/' + tribeId + '/';
+  document.getElementById('leaveModal').style.display = 'flex';
+}
+function closeLeaveModal() {
+  document.getElementById('leaveModal').style.display = 'none';
+}
+document.getElementById('leaveModal')?.addEventListener('click', function(e) {
+  if (e.target === this) closeLeaveModal();
+});
+</script>
+{% endblock %}

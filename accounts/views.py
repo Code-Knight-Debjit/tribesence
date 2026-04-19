@@ -45,7 +45,7 @@ def signup_view(request):
             user = User.objects.create_user(username=username, email=email, password=password, first_name=first, last_name=last)
             Profile.objects.create(user=user)
             login(request, user)
-            return redirect('onboarding')
+            return redirect('explore')
     return render(request, 'accounts/signup.html')
 
 
